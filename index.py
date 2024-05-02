@@ -618,6 +618,24 @@ def theme_set(choice):
             f.write("themes/coffee.json")
         elif choice =="Violet":
             f.write("themes/violet.json")
+        elif choice =="Blue":
+            f.write("themes/blue.json")
+        elif choice =="Carrot":
+            f.write("themes/carrot.json")
+        elif choice =="Marsh":
+            f.write("themes/marsh.json")
+        elif choice =="Metal":
+            f.write("themes/metal.json")
+        elif choice == "Pink":
+            f.write("themes/pink.json")
+        elif choice == "Red":
+            f.write("themes/red.json")
+        elif choice == "Rose":
+            f.write("themes/rose.json")
+        elif choice == "Sky":
+            f.write("themes/sky.json")
+        elif choice == "Yellow":
+            f.write("themes/yellow.json")
     f.close()
     app.destroy()  # Close the current window
     subprocess.Popen(["python", "index.py"])
@@ -648,7 +666,7 @@ devmenu = ctk.CTkOptionMenu(frame,values=["DevBlog", "Changelogs"],
 devmenu.grid(row=0, column=3, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create the theme selector
-thememenu = ctk.CTkOptionMenu(frame,values=["Default","Orange","Green","Coffee","Violet"], command=theme_set)
+thememenu = ctk.CTkOptionMenu(frame,values=["Default","Orange","Green","Coffee","Violet","Blue","Carrot","Marsh","Metal","Pink","Red","Rose","Sky","Yellow"], command=theme_set)
 thememenu.grid(row=0, column=4, padx=0, pady=0, sticky=ctk.W)  # Align to the west
 
 # Create a scrollable frame inside the existing frame to display contents
