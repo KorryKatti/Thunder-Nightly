@@ -665,7 +665,7 @@ commenu = ctk.CTkOptionMenu(frame, values=["Community", "Image Board", "Thunder 
 commenu.grid(row=0, column=2, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create DevBlogs Widget
-devmenu = ctk.CTkOptionMenu(frame,values=["DevBlog", "Changelogs"],
+devmenu = ctk.CTkOptionMenu(frame,values=["Dev Blog", "Changelogs"],
                                          command=devmenu_callback)
 devmenu.grid(row=0, column=3, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
 
