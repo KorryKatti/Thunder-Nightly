@@ -25,7 +25,19 @@ subprocess.Popen(["python", "appfiles/repup.py"])
 
 # Set the appearance mode and default color theme
 ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
-ctk.set_default_color_theme("themes/orange.json")  # Themes: blue (default), dark-blue, green
+#get theme from a dropdown
+# Read the theme name from theme.txt
+theme_file_path = "themes/theme.txt"
+try:
+    with open(theme_file_path, "r") as theme_file:
+        theme_name = theme_file.read().strip()
+
+    # Set the default color theme using the theme name
+    ctk.set_default_color_theme(theme_name)
+    print("Theme set successfully!")
+except FileNotFoundError:
+    print("Theme file not found.")
+
 
 #what download does
 def download_app():
@@ -592,30 +604,52 @@ def download_repo(repo_url, app_id, app_name):
     # Close the top-up window after 3 seconds
     download_window.after(3000, close_window)
 
+# most of the themes are from https://github.com/a13xe/CTkThemesPack
+def theme_set(choice):
+    with open("themes/theme.txt", "w") as f:
+        if choice == "Default":
+            file_path = "themes/theme.txt"
+            os.remove(file_path)
+        elif choice == "Orange":
+            f.write("themes/orange.json")
+        elif choice == "Green":
+            f.write("themes/green.json")
+        elif choice =="Coffee":
+            f.write("themes/coffee.json")
+        elif choice =="Violet":
+            f.write("themes/violet.json")
+    f.close()
+    app.destroy()  # Close the current window
+    subprocess.Popen(["python", "index.py"])
+
 
 # Create a frame inside the main window for organizing widgets
 frame = ctk.CTkFrame(app)
-frame.pack(fill=ctk.BOTH, expand=True, padx=20, pady=20)  # Pack the frame to fill the window
+frame.pack(fill=ctk.BOTH, expand=True, padx=11, pady=10)  # Pack the frame to fill the window
 
 # Create the optionmenu widget
 optionmenu = ctk.CTkOptionMenu(frame, values=["Home", "Client Update", "Quit"],
                                          command=optionmenu_callback)
-optionmenu.grid(row=0, column=0, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
+optionmenu.grid(row=0, column=0, padx=2, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create the library menu widget
 libmenu = ctk.CTkOptionMenu(frame, values=["Library", "Apps Update"],
                                          command=libmenu_callback)
-libmenu.grid(row=0, column=1, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
+libmenu.grid(row=0, column=1, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create the Commmunity Widget
 commenu = ctk.CTkOptionMenu(frame, values=["Community", "Image Board", "Thunder Halls"],
                                          command=commenu_callback)
-commenu.grid(row=0, column=2, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
+commenu.grid(row=0, column=2, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create DevBlogs Widget
-devmenu = ctk.CTkOptionMenu(frame,values=["Dev Blog", "Changelogs"],
+devmenu = ctk.CTkOptionMenu(frame,values=["DevBlog", "Changelogs"],
                                          command=devmenu_callback)
-devmenu.grid(row=0, column=3, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
+devmenu.grid(row=0, column=3, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
+
+# Create the theme selector
+thememenu = ctk.CTkOptionMenu(frame,values=["Default","Orange","Green","Coffee","Violet"], command=theme_set)
+thememenu.grid(row=0, column=4, padx=0, pady=0, sticky=ctk.W)  # Align to the west
 
 # Create a scrollable frame inside the existing frame to display contents
 scrollable_frame = ctk.CTkScrollableFrame(frame, width=1024, height=576, corner_radius=0, fg_color="transparent")
