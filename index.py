@@ -604,7 +604,7 @@ def download_repo(repo_url, app_id, app_name):
     # Close the top-up window after 3 seconds
     download_window.after(3000, close_window)
 
-# most of the themes are from https://github.com/a13xe/CTkThemesPack
+# most of the themes are from https://github.com/a13xe/CTkThemesPack and https://github.com/rigvedmaanas/CustomTkinterThemes
 def theme_set(choice):
     with open("themes/theme.txt", "w") as f:
         if choice == "Default":
@@ -636,6 +636,10 @@ def theme_set(choice):
             f.write("themes/sky.json")
         elif choice == "Yellow":
             f.write("themes/yellow.json")
+        elif choice == "FlipperZero":
+            f.write("themes/flipperzero.json")
+        elif choice == "hacked":
+            f.write("themes/hacked.json")
     f.close()
     app.destroy()  # Close the current window
     subprocess.Popen(["python", "index.py"])
@@ -666,7 +670,7 @@ devmenu = ctk.CTkOptionMenu(frame,values=["DevBlog", "Changelogs"],
 devmenu.grid(row=0, column=3, padx=0, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create the theme selector
-thememenu = ctk.CTkOptionMenu(frame,values=["Default","Orange","Green","Coffee","Violet","Blue","Carrot","Marsh","Metal","Pink","Red","Rose","Sky","Yellow"], command=theme_set)
+thememenu = ctk.CTkOptionMenu(frame,values=["Default","Orange","Green","Coffee","Violet","Blue","Carrot","Marsh","Metal","Pink","Red","Rose","Sky","Yellow","FlipperZero","hacked"], command=theme_set)
 thememenu.grid(row=0, column=4, padx=0, pady=0, sticky=ctk.W)  # Align to the west
 
 # Create a scrollable frame inside the existing frame to display contents
