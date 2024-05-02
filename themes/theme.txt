@@ -1,1 +1,1 @@
-themes/orange.json
+themes/coffee.json
