@@ -10,4 +10,8 @@ Nightly builds are meant for testing purposes only and are not stable releases. 
 
 ---
 
-For stable releases, please visit the [Thunder Stable Repository](https://github.com/korrykatti/Thunder).
+🛠️ **Contributing:** If you want to contribute to Thunder, please submit your pull requests to this repository. Pull requests to the stable repository will be ignored.
+
+---
+
+For stable releases, please visit the [Thunder Stable Repository](https://github.com/ThunderPlatform/stable).
