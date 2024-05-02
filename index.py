@@ -25,7 +25,7 @@ subprocess.Popen(["python", "appfiles/repup.py"])
 
 # Set the appearance mode and default color theme
 ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
-ctk.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
+ctk.set_default_color_theme("themes/orange.json")  # Themes: blue (default), dark-blue, green
 
 #what download does
 def download_app():
@@ -262,6 +262,18 @@ def libmenu_callback(choice):
             # Display a message if no apps are available
             no_apps_label = ctk.CTkLabel(scrollable_frame, text="Download some apps first silly")
             no_apps_label.pack(fill=ctk.X, padx=10, pady=(10, 5), anchor="w")
+
+            # Load the image
+            notfound_path = "media/404.png" 
+            notfound = PILImage.open(notfound_path)
+
+            # Convert the image into a CTkImage object
+            ctk_alpha = ctk.CTkImage(light_image=notfound, dark_image=notfound, size=(400,400))
+
+            # Create a label to display the image
+            notfound_label = ctk.CTkLabel(scrollable_frame, image=ctk_alpha, text= "")
+            notfound_label.pack(fill=ctk.X, padx=10, pady=5)
+
 
 
     elif choice == "Apps Update":
@@ -620,7 +632,7 @@ alpha = PILImage.open(alpha_path)
 ctk_alpha = ctk.CTkImage(light_image=alpha, dark_image=alpha, size=(1280, 100))
 
 # Create a label to display the image
-alpha_label = ctk.CTkLabel(frame, image=ctk_alpha)
+alpha_label = ctk.CTkLabel(frame, image=ctk_alpha, text ="")
 alpha_label.grid(row=1, column=0, columnspan=4, padx=20, pady=20, sticky="ew")  # Adjust padding and alignment as needed
 
 # Start the main event loop
