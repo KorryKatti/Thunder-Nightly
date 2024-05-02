@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import subprocess
 import threading
+from PIL import Image as PILImage
 import os
 import stat
 import time
@@ -44,8 +45,6 @@ def download_image(url):
         print(f"Error downloading image from URL: {url}. Error: {e}")
         return None
 
-# Function to create labels for each application data
-# Function to create labels for each application data
 # Function to create labels for each application data
 def create_labels():
     data_dir = "data"
@@ -589,29 +588,40 @@ frame.pack(fill=ctk.BOTH, expand=True, padx=20, pady=20)  # Pack the frame to fi
 # Create the optionmenu widget
 optionmenu = ctk.CTkOptionMenu(frame, values=["Home", "Client Update", "Quit"],
                                          command=optionmenu_callback)
-optionmenu.grid(row=0, column=0, padx=10, pady=0, sticky=ctk.W)  # Align to the west (left)
+optionmenu.grid(row=0, column=0, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create the library menu widget
 libmenu = ctk.CTkOptionMenu(frame, values=["Library", "Apps Update"],
                                          command=libmenu_callback)
-libmenu.grid(row=0, column=1, padx=10, pady=0, sticky=ctk.W)  # Align to the west (left)
+libmenu.grid(row=0, column=1, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create the Commmunity Widget
 commenu = ctk.CTkOptionMenu(frame, values=["Community", "Image Board", "Thunder Halls"],
                                          command=commenu_callback)
-commenu.grid(row=0, column=2, padx=10, pady=0, sticky=ctk.W)  # Align to the west (left)
+commenu.grid(row=0, column=2, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create DevBlogs Widget
 devmenu = ctk.CTkOptionMenu(frame,values=["Dev Blog", "Changelogs"],
                                          command=devmenu_callback)
-devmenu.grid(row=0, column=3, padx=10, pady=0, sticky=ctk.W)  # Align to the west (left)
+devmenu.grid(row=0, column=3, padx=5, pady=0, sticky=ctk.W)  # Align to the west (left)
 
 # Create a scrollable frame inside the existing frame to display contents
 scrollable_frame = ctk.CTkScrollableFrame(frame, width=1024, height=576, corner_radius=0, fg_color="transparent")
-scrollable_frame.grid(row=1, column=0, columnspan=4, sticky="nsew")
+scrollable_frame.grid(row=2, column=0, columnspan=4, sticky="nsew")
 
 # Add widgets to the scrollable frame
 create_labels()
+
+# Load the image
+alpha_path = "media/grass.png" 
+alpha = PILImage.open(alpha_path)
+
+# Convert the image into a CTkImage object
+ctk_alpha = ctk.CTkImage(light_image=alpha, dark_image=alpha, size=(1280, 100))
+
+# Create a label to display the image
+alpha_label = ctk.CTkLabel(frame, image=ctk_alpha)
+alpha_label.grid(row=1, column=0, columnspan=4, padx=20, pady=20, sticky="ew")  # Adjust padding and alignment as needed
 
 # Start the main event loop
 app.mainloop()
