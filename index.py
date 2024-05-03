@@ -410,6 +410,7 @@ def handle_app_click(app_id):
                 print(f"Error creating virtual environment: {e}")
 
         # Function to start the app
+        # Function to start the app
         def start_app():
             try:
                 # Check if the thunderenv directory exists in the app directory
@@ -429,13 +430,17 @@ def handle_app_click(app_id):
 
                     if os.path.exists(main_file):
                         print("Launching the app...")
+                        # Change the current working directory to app_dir
+                        os.chdir(app_dir)
                         subprocess.run([os.path.join(thunderenv_path, "bin", "python"), main_file])
                     else:
                         print("Main file not found.")
+                        return  # Return if main file is not found
                 else:
                     print("Thunderenv not found.")
             except Exception as e:
                 print(f"Error starting the app: {e}")
+
 
         # Function to uninstall the app
 
@@ -608,8 +613,7 @@ def download_repo(repo_url, app_id, app_name):
 def theme_set(choice):
     with open("themes/theme.txt", "w") as f:
         if choice == "Default":
-            file_path = "themes/theme.txt"
-            os.remove(file_path)
+            f.write("")
         elif choice == "Orange":
             f.write("themes/orange.json")
         elif choice == "Green":
