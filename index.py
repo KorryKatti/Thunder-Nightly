@@ -427,12 +427,14 @@ def handle_app_click(app_id):
                     # Get the main file path from the app's JSON file
                     main_file_name = app_data.get("main_file", "")
                     main_file = os.path.join(app_dir, main_file_name)
+                    maincdfile = main_file_name
 
                     if os.path.exists(main_file):
                         print("Launching the app...")
                         # Change the current working directory to app_dir
                         os.chdir(app_dir)
-                        subprocess.run([os.path.join(thunderenv_path, "bin", "python"), main_file])
+                        thundercdenv = "myenv"
+                        subprocess.run([os.path.join(thundercdenv, "bin", "python"), maincdfile])
                     else:
                         print("Main file not found.")
                         return  # Return if main file is not found
