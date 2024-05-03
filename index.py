@@ -409,104 +409,79 @@ def handle_app_click(app_id):
             except Exception as e:
                 print(f"Error creating virtual environment: {e}")
 
-        # Store the current working directory
-        current_dir = os.getcwd()
+        # Function to start the app
+        def start_app():
+            try:
+                # Check if the thunderenv directory exists in the app directory
+                if os.path.exists(thunderenv_path) and os.path.isdir(thunderenv_path):
+                    print("Thunderenv found. Starting the app...")
 
-        # Change the working directory to the app directory
-        os.chdir(app_dir)
+                    # Install requirements from requirements.txt if exists
+                    requirements_file = os.path.join(app_dir, "requirements.txt")
+                    if os.path.exists(requirements_file):
+                        print("Installing requirements from requirements.txt...")
+                        subprocess.run([os.path.join(thunderenv_path, "bin", "pip"), "install", "-r", requirements_file])
+                        print("Requirements installed successfully.")
+
+                    # Get the main file path from the app's JSON file
+                    main_file_name = app_data.get("main_file", "")
+                    main_file = os.path.join(app_dir, main_file_name)
+
+                    if os.path.exists(main_file):
+                        print("Launching the app...")
+                        subprocess.run([os.path.join(thunderenv_path, "bin", "python"), main_file])
+                    else:
+                        print("Main file not found.")
+                else:
+                    print("Thunderenv not found.")
+            except Exception as e:
+                print(f"Error starting the app: {e}")
+
+        # Function to uninstall the app
+
+        def uninstall_app():
+            # Define the onerror handler function
+            def onerror(func, path, exc_info):
+                """
+                Error handler for ``shutil.rmtree``.
+
+                If the error is due to an access error (read only file)
+                it attempts to add write permission and then retries.
+
+                If the error is for another reason it re-raises the error.
+                """
+                # Is the error an access error?
+                if not os.access(path, os.W_OK):
+                    os.chmod(path, stat.S_IWUSR)
+                    func(path)
+                else:
+                    raise
+
+            # Delete the directory corresponding to the app
+            try:
+                # Attempt to remove the directory with the onerror handler
+                shutil.rmtree(app_dir, onerror=onerror)
+                print("App directory deleted successfully:", app_dir)
+                
+                # Remove app ID from downloads.txt
+                downloads_file = os.path.join("appfiles", "downloads.txt")
+                if os.path.exists(downloads_file):
+                    print("downloads.txt exists.")
+                    remove_word_from_file(downloads_file, numeric_app_id)
+                else:
+                    print("downloads.txt not found.")
+            except FileNotFoundError:
+                print(f"Error: {app_dir} not found.")
+            except Exception as e:
+                print(f"Error uninstalling the app: {e}")
+
 
         # Call cherry() with start and uninstall commands
-        start_app_func = start_app(thunderenv_path, app_data, app_dir)
-        uninstall_app_func = uninstall_app(app_dir, numeric_app_id)
-        cherry(start_app_func, uninstall_app_func)
-
-        # Change back to the original working directory
-        os.chdir(current_dir)
+        cherry(start_app, uninstall_app)
 
     except Exception as e:
         print(f"Error handling app click: {e}")
 
-def start_app(thunderenv_path, app_data, app_dir):
-    def start():
-        try:
-            # Check if the thunderenv directory exists in the app directory
-            if os.path.exists(thunderenv_path) and os.path.isdir(thunderenv_path):
-                print("Thunderenv found. Starting the app...")
-
-                # Change the working directory to the app directory
-                os.chdir(app_dir)
-
-                # Install requirements from requirements.txt if exists
-                requirements_file = os.path.join(app_dir, "requirements.txt")
-                if os.path.exists(requirements_file):
-                    print("Installing requirements from requirements.txt...")
-                    subprocess.run([os.path.join(thunderenv_path, "bin", "pip"), "install", "-r", requirements_file])
-                    print("Requirements installed successfully.")
-
-                # Get the main file path from the app's JSON file
-                main_file_name = app_data.get("main_file", "")
-                main_file = os.path.join(app_dir, main_file_name)
-
-                if os.path.exists(main_file):
-                    print("Launching the app...")
-                    subprocess.run([os.path.join(thunderenv_path, "bin", "python"), main_file])
-                else:
-                    main_file_name = app_data.get("main_file", "")
-                    main_file_path = os.path.join(app_dir, main_file_name)
-                    print(f"Main file '{main_file_name}' not found at '{main_file_path}'.")
-
-
-            else:
-                print("Thunderenv not found.")
-        except Exception as e:
-            print(f"Error starting the app: {e}")
-
-    return start
-
-def uninstall_app(app_dir, numeric_app_id):
-    try:
-        def uninstall():
-            try:
-                # Define the onerror handler function
-                def onerror(func, path, exc_info):
-                    """
-                    Error handler for ``shutil.rmtree``.
-
-                    If the error is due to an access error (read only file)
-                    it attempts to add write permission and then retries.
-
-                    If the error is for another reason it re-raises the error.
-                    """
-                    # Is the error an access error?
-                    if not os.access(path, os.W_OK):
-                        os.chmod(path, stat.S_IWUSR)
-                        func(path)
-                    else:
-                        raise
-
-                # Delete the directory corresponding to the app
-                try:
-                    # Attempt to remove the directory with the onerror handler
-                    shutil.rmtree(app_dir, onerror=onerror)
-                    print("App directory deleted successfully:", app_dir)
-                    
-                    # Remove app ID from downloads.txt
-                    downloads_file = os.path.join("appfiles", "downloads.txt")
-                    if os.path.exists(downloads_file):
-                        print("downloads.txt exists.")
-                        remove_word_from_file(downloads_file, numeric_app_id)
-                    else:
-                        print("downloads.txt not found.")
-                except FileNotFoundError:
-                    print(f"Error: {app_dir} not found.")
-                except Exception as e:
-                    print(f"Error uninstalling the app: {e}")
-            except Exception as e:
-                print(f"Error within uninstall function: {e}")
-                
-        return uninstall
-    except Exception as e:
-        print(f"Error defining uninstall_app: {e}")
 
 
 # CallBack function for commenu
