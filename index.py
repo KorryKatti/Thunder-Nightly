@@ -435,6 +435,7 @@ def handle_app_click(app_id):
                         os.chdir(app_dir)
                         thundercdenv = "myenv"
                         subprocess.run([os.path.join(thundercdenv, "bin", "python"), maincdfile])
+                        os.chdir("../../")
                     else:
                         print("Main file not found.")
                         return  # Return if main file is not found
