@@ -1,5 +1,4 @@
-![Discord](https://img.shields.io/discord/1236316201341157437?style=for-the-badge&logo=discord)
-
+![Discord](https://img.shields.io/discord/1236316201341157437?style=flat-square&logo=discord&link=https%3A%2F%2Fdiscord.gg%2FxgGDNEw3FY)
 
 
 # Thunder Nightly Repository
