@@ -17,3 +17,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# this is a special version of updater which only exists for nightly builds
