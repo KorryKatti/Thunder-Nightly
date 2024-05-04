@@ -1,3 +1,6 @@
+![Discord](https://img.shields.io/discord/:1236316201341157437)
+
+
 # Thunder Nightly Repository
 
 ⚠️ **Warning:** This is the Nightly repository of Thunder. Please note the following:
