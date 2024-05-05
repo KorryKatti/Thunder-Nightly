@@ -1,5 +1,4 @@
-![Discord](https://img.shields.io/discord/1236316201341157437?style=flat-square&logo=discord&link=https%3A%2F%2Fdiscord.gg%2FxgGDNEw3FY)
-
+<img alt="Discord" src="https://img.shields.io/discord/1236316201341157437?logo=discord">
 
 # Thunder Nightly Repository
 
