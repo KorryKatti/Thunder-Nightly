@@ -10,6 +10,9 @@ def main():
     # Create run.py and open.sh on the desktop
     create_files_on_desktop(current_dir)
 
+    # Create desktop shortcut
+    create_desktop_shortcut()
+
 def save_location(location):
     with open('current_location.txt', 'w') as f:
         f.write(location)
@@ -27,6 +30,19 @@ def create_files_on_desktop(location):
 
     # Make open.sh executable
     os.chmod(open_sh_path, 0o755)
+
+def create_desktop_shortcut():
+    desktop_path = os.path.expanduser("~/Desktop")
+    desktop_entry_path = os.path.join(desktop_path, "Thunder.desktop")
+
+    with open(desktop_entry_path, 'w') as desktop_file:
+        desktop_file.write("[Desktop Entry]\n")
+        desktop_file.write("Name=Thunder\n")
+        desktop_file.write("Type=Application\n")
+        desktop_file.write("Exec=open.sh\n")
+
+    # Make the desktop shortcut executable
+    os.chmod(desktop_entry_path, 0o755)
 
 if __name__ == "__main__":
     main()
