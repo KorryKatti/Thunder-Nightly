@@ -39,7 +39,7 @@ def create_desktop_shortcut():
         desktop_file.write("[Desktop Entry]\n")
         desktop_file.write("Name=Thunder\n")
         desktop_file.write("Type=Application\n")
-        desktop_file.write("Exec=open.sh\n")
+        desktop_file.write("Exec=sh open.sh\n")
 
     # Make the desktop shortcut executable
     os.chmod(desktop_entry_path, 0o755)
