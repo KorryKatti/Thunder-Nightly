@@ -1,4 +1,4 @@
 [Desktop Entry]
 Name=Thunder
 Type=Application
-Exec=run.sh
+Exec=sh run.sh
