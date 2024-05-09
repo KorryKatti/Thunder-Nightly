@@ -13,12 +13,9 @@ requests==2.31.0
 soupsieve==2.5
 tkinterhtml
 urllib3==2.2.1
-pygame
-pygame-menu
-pyglet
-moviepy
 PyQt5
 tkhtmlview
 tkinterweb
-opencv-python
+tkvideoplayer==2.8 --no-deps
+
 
