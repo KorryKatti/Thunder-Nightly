@@ -56,9 +56,65 @@ def download_image(url):
     except Exception as e:
         print(f"Error downloading image from URL: {url}. Error: {e}")
         return None
-
 # Function to create labels for each application data
 def create_labels():
+
+    # messy code , i am aware
+    search_bar = ctk.CTkEntry(scrollable_frame, placeholder_text="Search")
+    search_bar.pack(side="top", fill="x", padx=20, pady=20)
+
+    def search_labels(whatsearch):
+        clear_scrollable_frame()
+
+        data_dir = "data"
+        filenames = sorted(os.listdir(data_dir), reverse=True)
+        for filename in filenames:
+            if filename.endswith(".json"):
+                try:
+                    with open(os.path.join(data_dir, filename), "r") as f:
+                        app_data = json.load(f)
+
+                        app_frame = ctk.CTkFrame(scrollable_frame)
+                        app_frame.pack(fill=ctk.X, padx=10, pady=5)
+
+                        app_name = app_data.get("app_name", "Unknown")
+                        if whatsearch.lower() in app_name.lower():
+                            name_label = ctk.CTkLabel(app_frame, text="{app_name}, It was found".format(app_name=app_name))
+                            name_label.pack(side=ctk.TOP, padx=10, pady=5)
+                            # Display the application description
+                            description = app_data.get("description", "No description available")
+                            description_label = ctk.CTkLabel(app_frame, text=description, wraplength=700)
+                            description_label.pack(side=ctk.TOP, padx=10, pady=5)
+
+                            # Display the version
+                            version = app_data.get("version", "Couldn't get version")
+                            version_label = ctk.CTkLabel(app_frame, text=version, wraplength=700)
+                            version_label.pack(side=ctk.LEFT, padx=10, pady=5)
+
+                            # Create a button for downloading the application
+                            download_button = ctk.CTkButton(app_frame, text="Download", command=lambda app=app_data: download_app(app))
+                            download_button.pack(side=ctk.RIGHT, padx=10, pady=5)
+
+                            # Create a separator line
+                            separator = ctk.CTkLabel(scrollable_frame, text="--------------------------")
+                            separator.pack(fill=ctk.X, padx=10, pady=5)
+                        else:
+                            name_label = ctk.CTkLabel(app_frame, text="Not Found")
+                            name_label.pack(side=ctk.TOP, padx=10, pady=5)
+                except Exception as e:
+                    print(f"Error loading data from {filename}: {e}")
+
+    def clear_scrollable_frame():
+        for widget in scrollable_frame.winfo_children():
+            widget.destroy()
+
+    def on_search(event=None):
+        whatsearch = search_bar.get()
+        print(whatsearch)
+        search_labels(whatsearch)
+
+    search_bar.bind("<Return>", on_search)
+# search bar cloes now
     data_dir = "data"
     # Get the list of filenames and sort them
     filenames = sorted(os.listdir(data_dir) , reverse=True)
@@ -174,6 +230,7 @@ app = ctk.CTk()
 app.geometry("1152×648")
 app.resizable(True, True)
 app.title("Thunder 🗲")
+
 
 def fetch_website_version(app_id):
     # URL of the website where version is located
@@ -502,7 +559,7 @@ def commenu_callback(choice):
         webbrowser.open("http://korrykatti.github.io/others/thunder/halls.html")
 
 import tkinterweb as tkweb
-
+# huh , i should have removed these imports
 import requests
 
 # CallBack function for devmenu
@@ -700,6 +757,8 @@ alpha_label.pack(padx=20, pady=20, fill="x")  # Adjust padding and alignment as 
 # Create a scrollable frame inside the existing main frame to display contents
 scrollable_frame = ctk.CTkScrollableFrame(mainframe, width=1024, height=576, corner_radius=0, fg_color="transparent")
 scrollable_frame.pack(expand=True, fill="both")
+
+
 
 # Add widgets to the scrollable frame
 create_labels()
