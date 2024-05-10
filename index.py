@@ -406,6 +406,7 @@ def libmenu_callback(choice):
 
     # i am running out of names , this function displays the app data finally
 def cherry(start_command, uninstall_command):
+    
     # Create a new frame for displaying additional data
     cherry_frame = ctk.CTkFrame(scrollable_frame, width=400, height=400, bg_color="white")
     cherry_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, padx=10, pady=10)
@@ -491,8 +492,12 @@ def handle_app_click(app_id):
                         # Change the current working directory to app_dir
                         os.chdir(app_dir)
                         thundercdenv = "myenv"
-                        subprocess.run([os.path.join(thundercdenv, "bin", "python"), maincdfile])
-                        os.chdir("../../")
+                        if os.name == 'posix':  # For Linux
+                            subprocess.run([os.path.join(thundercdenv, "bin", "python"), maincdfile])
+                            os.chdir("../../")
+                        elif os.name == 'nt':  # For Windows
+                            subprocess.run([os.path.join(thundercdenv, "Scripts", "python.exe"), maincdfile])
+                            os.chdir("../../")
                     else:
                         print("Main file not found.")
                         return  # Return if main file is not found
