@@ -2,6 +2,7 @@ import customtkinter as ctk
 import subprocess
 import threading
 from PIL import Image as PILImage
+from PIL import ImageTk
 import os
 import stat
 import time
@@ -19,6 +20,7 @@ import webbrowser
 from io import BytesIO
 import markdown
 from tkinterhtml import HtmlFrame
+
 
 # Launch repup.py in the background
 subprocess.Popen(["python", "appfiles/repup.py"])
@@ -78,7 +80,9 @@ def create_labels():
                         app_frame.pack(fill=ctk.X, padx=10, pady=5)
 
                         app_name = app_data.get("app_name", "Unknown")
-                        if whatsearch.lower() in app_name.lower():
+                        app_id = app_data.get("app_id", "Unknown")
+                        description = app_data.get("description", "No description available")
+                        if whatsearch.lower() in app_name.lower() or whatsearch.lower() in app_id.lower() or whatsearch.lower() in description.lower():
                             name_label = ctk.CTkLabel(app_frame, text="{app_name}, It was found".format(app_name=app_name))
                             name_label.pack(side=ctk.TOP, padx=10, pady=5)
                             # Display the application description
@@ -99,8 +103,8 @@ def create_labels():
                             separator = ctk.CTkLabel(scrollable_frame, text="--------------------------")
                             separator.pack(fill=ctk.X, padx=10, pady=5)
                         else:
-                            name_label = ctk.CTkLabel(app_frame, text="Not Found")
-                            name_label.pack(side=ctk.TOP, padx=10, pady=5)
+                            print("Not found")
+
                 except Exception as e:
                     print(f"Error loading data from {filename}: {e}")
 
@@ -230,6 +234,11 @@ app = ctk.CTk()
 app.geometry("1152×648")
 app.resizable(True, True)
 app.title("Thunder 🗲")
+
+#adding icon to app
+icon_path = os.path.join("media", "icon.png")
+icon_image = ImageTk.PhotoImage(file=icon_path)
+app.iconphoto(False, icon_image)
 
 
 def fetch_website_version(app_id):
