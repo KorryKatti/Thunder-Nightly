@@ -17,5 +17,5 @@ PyQt5
 tkhtmlview
 tkinterweb
 tkvideoplayer==2.8 --no-deps
-
+tabulate
 
