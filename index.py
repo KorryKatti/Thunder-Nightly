@@ -148,13 +148,13 @@ def create_labels():
 
                         app_frame = ctk.CTkFrame(scrollable_frame)
                         app_frame.pack(fill=ctk.X, padx=10, pady=5)
-
+                        #for some reason its getting too big gaps when app is not in the order , if it makes sense
                         app_name = app_data.get("app_name", "Unknown")
                         app_id = app_data.get("app_id", "Unknown")
                         description = app_data.get("description", "No description available")
                         if whatsearch.lower() in app_name.lower() or whatsearch.lower() in app_id.lower() or whatsearch.lower() in description.lower():
-                            name_label = ctk.CTkLabel(app_frame, text="{app_name}, It was found".format(app_name=app_name))
-                            name_label.pack(side=ctk.TOP, padx=10, pady=5)
+                            name_label = ctk.CTkLabel(app_frame, text="{app_name}, was found".format(app_name=app_name))
+                            name_label.pack(side=ctk.TOP, padx=10, pady=5) #maybe changing pad will help with useless gap ?
                             # Display the application description
                             description = app_data.get("description", "No description available")
                             description_label = ctk.CTkLabel(app_frame, text=description, wraplength=700)
@@ -583,7 +583,7 @@ def handle_app_click(app_id):
                 else:
                     print("Thunderenv not found.")
             except Exception as e:
-                print(f"Error starting the app: {e}")
+                print(f"Error starting the app in start app function : {e}")
 
 
         # Function to uninstall the app
