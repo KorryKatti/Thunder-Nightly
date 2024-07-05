@@ -16,6 +16,5 @@ urllib3==2.2.1
 PyQt5
 tkhtmlview
 tkinterweb
-tkvideoplayer==2.8 --no-deps
 tabulate
 
