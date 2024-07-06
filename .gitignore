@@ -1,11 +1,11 @@
 myenv/
 instruct.txt
-appfiles/data
-appfiles/app_data.json
-data/
-update/
-common/
-appfiles/downloads.txt
+appdata/appfiles/data
+appdata/appfiles/app_data.json
+appdata/data/
+appdata/update/
+appdata/common/
+appdata/appfiles/downloads.txt
 ok.py
 ok.txt
 src/
