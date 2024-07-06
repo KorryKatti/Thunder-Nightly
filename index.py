@@ -149,6 +149,7 @@ def create_labels():
                         app_frame = ctk.CTkFrame(scrollable_frame)
                         app_frame.pack(fill=ctk.X, padx=10, pady=5)
                         #for some reason its getting too big gaps when app is not in the order , if it makes sense
+                        # TODO : remove blank spaces of apps not matching search criteria
                         app_name = app_data.get("app_name", "Unknown")
                         app_id = app_data.get("app_id", "Unknown")
                         description = app_data.get("description", "No description available")
