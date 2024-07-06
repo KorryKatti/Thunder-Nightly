@@ -770,6 +770,8 @@ def theme_set(choice):
             f.write("themes/blue.json")
         elif choice =="Carrot":
             f.write("themes/carrot.json")
+        elif choice =="Cyberpunk":
+            f.write("themes/cyberpunk.json")
         elif choice =="Marsh":
             f.write("themes/marsh.json")
         elif choice =="Metal":
@@ -823,7 +825,7 @@ devmenu = ctk.CTkOptionMenu(frame, values=["Dev Blog", "Changelogs"],
 devmenu.pack(pady=(10, 10), expand=True, side="left")
 
 # Create the theme selector
-thememenu = ctk.CTkOptionMenu(frame, values=["Default","Orange","Green","Coffee","Violet","Blue","Carrot","Marsh","Metal","Pink","Red","Rose","Sky","Yellow","FlipperZero","hacked"],
+thememenu = ctk.CTkOptionMenu(frame, values=["Default","Orange","Green","Coffee","Violet","Blue","Cyberpunk","Carrot","Marsh","Metal","Pink","Red","Rose","Sky","Yellow","FlipperZero","hacked"],
                                command=theme_set)
 thememenu.pack(pady=(10, 10), expand=True, side="left")
 
