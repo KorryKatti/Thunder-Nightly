@@ -18,3 +18,4 @@ tkhtmlview
 tkinterweb
 tabulate
 flask
+CTkMessagebox
