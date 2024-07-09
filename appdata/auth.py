@@ -1,6 +1,8 @@
 import customtkinter
+import random
 
-customtkinter.set_default_color_theme("themes/cyberpunk.json")
+customtkinter.set_default_color_theme("themes/blue.json")
+
 
 
 app = customtkinter.CTk()
