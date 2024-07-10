@@ -33,6 +33,9 @@ def devmenu(choice):
 def cl_settings():
     print("settings pressed")
 
+def launch_mirage():
+    print("launching mirage")
+
 # The option menus on the top
 homemenu = customtkinter.CTkOptionMenu(app, values=["Home", "Client Update", "Quit"], command=homemenu)
 homemenu.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
@@ -49,6 +52,9 @@ devmenu.grid(row=0, column=3, padx=5, pady=10, sticky="nsew")
 settings = customtkinter.CTkButton(app, text="Settings", command=cl_settings)
 settings.grid(row=0, column=4, padx=5, pady=10, sticky="nsew")
 
+mirageicon = customtkinter.CTkButton(app, text="Mirage", command=launch_mirage)
+mirageicon.grid(row=0, column=5, padx=5, pady=10, sticky="nsew")
+
 # app banner
 # Load the image
 banner_path = "media/grass.png" 
@@ -60,7 +66,7 @@ ctk_banner = customtkinter.CTkImage(light_image=banner, dark_image=banner, size=
 #########################################3
 # Main frame
 main_frame = customtkinter.CTkScrollableFrame(app)
-main_frame.grid(row=1, column=0, columnspan=5, padx=5, pady=5, sticky="nsew")
+main_frame.grid(row=1, column=0, columnspan=6, padx=5, pady=5, sticky="nsew")
 
 # Create a label to display the image
 banner = customtkinter.CTkLabel(main_frame, image=ctk_banner, text ="")
