@@ -1,42 +1,63 @@
 import customtkinter
-import random
-import string
 import json
+import time
 import os
-from CTkMessagebox import CTkMessagebox
+import uuid
 import requests
+from CTkMessagebox import CTkMessagebox
 
 customtkinter.set_default_color_theme("themes/cyberpunk.json")
 
+# Function to close window after a delay
 def close_window(window):
-    window.destroy()
+    window.after(3000, window.destroy)  # Close window after 3000 milliseconds (3 seconds)
 
-def reopen_app():
-    app.deiconify()
+# Function to generate a persistent identifier (UUID) for the user
+def generate_user_id():
+    if not os.path.exists('userdata'):
+        os.makedirs('userdata')
+
+    if os.path.exists('userdata/userid.txt'):
+        with open('userdata/userid.txt', 'r') as file:
+            user_id = file.read().strip()
+    else:
+        user_id = str(uuid.uuid4())
+        with open('userdata/userid.txt', 'w') as file:
+            file.write(user_id)
+    return user_id
 
 # Function to send user info to a server for cross-checking
-def send_userinfo_to_server(username, email, secret_key):
+def send_userinfo_to_server(username, email, user_id=None):
     url = 'http://127.0.0.1:5000/user'
     payload = {
         'username': username,
-        'email': email,
-        'secret_key': secret_key
+        'email': email
     }
-    response = requests.post(url, json=payload)
-    server_response = response.json().get('status')
+    if user_id:
+        payload['user_id'] = user_id
 
-    if server_response == 231:
-        CTkMessagebox(title="Login Success", message="User exists, logging in now", icon="check")
-        close_window(app)
-    elif server_response == 232:
-        CTkMessagebox(title="Register Success", message="User does not exist, creating a new user", icon="check")
-        close_window(app)
-    elif server_response == 233:
-        CTkMessagebox(title="Error", message="The email you provided didn't match the username", icon="warning")
-        reopen_app()
-    else:
-        CTkMessagebox(title="Error", message="Some error occurred", icon="error")
-        reopen_app()
+    try:
+        response = requests.post(url, json=payload)
+        server_response = response.json().get('status')
+
+        if server_response == 231:
+            CTkMessagebox(title="Login Success", message="User exists, logging in now", icon="check")
+            close_window(app)
+            return True
+        elif server_response == 232:
+            CTkMessagebox(title="Register Success", message="User does not exist, creating a new user", icon="check")
+            close_window(app)
+            return True
+        elif server_response == 233:
+            CTkMessagebox(title="Error", message="The email you provided didn't match the username", icon="warning")
+            return False
+        else:
+            CTkMessagebox(title="Error", message="Some error occurred", icon="warning")
+            return False
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        CTkMessagebox(title="Error", message="Failed to connect to server", icon="warning")
+        return False
 
 # Create main application window
 app = customtkinter.CTk()
@@ -47,7 +68,7 @@ def start_app():
     print("Starting app now")
     with open('userdata/userinfo.json', 'r') as file:
         user_data = json.load(file)
-        send_userinfo_to_server(user_data['username'], user_data['email'], user_data['secret_key'])
+        send_userinfo_to_server(user_data['username'], user_data['email'])
 
 def start_app_guest():
     print("Starting app with nothing to send to server")
@@ -57,44 +78,54 @@ def check_existing_user():
         CTkMessagebox(title="Welcome", message="Already logged in", icon="check")
         start_app()
 
-def generate_secret_key(length=8):
-    characters = string.ascii_letters + string.digits
-    random_string = ''.join(random.choice(characters) for _ in range(length))
-    return random_string
-
 def submit():
     username_text = username.get()
     email_text = email.get()
     if "@" not in email_text or "." not in email_text:
         CTkMessagebox(title="Error", message="The email you entered is incorrect", icon="warning")
         return
-    random_string = generate_secret_key()
-    user_data = {
-        "username": username_text,
-        "email": email_text,
-        "secret_key": random_string
-    }
-    if not os.path.exists('userdata'):
-        os.makedirs('userdata')
-    with open('userdata/userinfo.json', 'w') as file:
-        json.dump(user_data, file)
-    CTkMessagebox(title="Welcome", message="Welcome To Thunder", icon="check")
-    close_window(app)
-    start_app()
+
+    user_id = generate_user_id()  # Get or generate persistent user identifier
+
+    # Check if userinfo.json already exists
+    if os.path.exists('userdata/userinfo.json'):
+        with open('userdata/userinfo.json', 'r') as file:
+            user_data = json.load(file)
+            user_data['user_id'] = user_id  # Add user_id to existing data
+    else:
+        user_data = {
+            "username": username_text,
+            "email": email_text,
+            "user_id": user_id  # Store user_id along with initial data
+        }
+
+    # Send user info to server first
+    if send_userinfo_to_server(user_data['username'], user_data['email'], user_data['user_id']):
+        if not os.path.exists('userdata'):
+            os.makedirs('userdata')
+
+        with open('userdata/userinfo.json', 'w') as file:
+            json.dump(user_data, file)
+
+        CTkMessagebox(title="Welcome", message="Welcome To Thunder", icon="check")
+        close_window(app)
 
 def no_login():
-    random_string = generate_secret_key()
+    user_id = generate_user_id()  # Get or generate persistent user identifier
+
     guest_data = {
         "username": "Guest",
         "email": "guest@thunder.korrykatti.site",
-        "secret_key": random_string
+        "user_id": user_id  # Store user_id for guest user as well
     }
+
     if not os.path.exists('userdata'):
         os.makedirs('userdata')
+
     with open('userdata/userinfo.json', 'w') as file:
         json.dump(guest_data, file)
+
     CTkMessagebox(title="Welcome", message="Logging in with guest credentials", icon="check")
-    close_window(app)
     start_app_guest()
 
 # UI Elements
