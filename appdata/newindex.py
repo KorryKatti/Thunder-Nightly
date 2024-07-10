@@ -40,17 +40,18 @@ devmenu.grid(row=0, column=3, padx=5, pady=10)
 settings = customtkinter.CTkButton(app, text="Settings", command=cl_settings)
 settings.grid(row=0, column=4, padx=5, pady=10)
 
-
-
-
-
-
-
-
-
-
-
-
+#main frame
+main_frame = customtkinter.CTkScrollableFrame(app, width=800, height=640)
+main_frame.grid(row=1, column=0, columnspan=8, padx=5, pady=5)
+# recommendations
+recommendations_frame = customtkinter.CTkScrollableFrame(main_frame, width=750, height=220)
+recommendations_frame.grid(row=0, column=0, columnspan=6, padx=5, pady=10)
+#all frame
+all_frame = customtkinter.CTkScrollableFrame(main_frame, width=750, height=220)
+all_frame.grid(row=1, column=0, columnspan=6, padx=5, pady=10)
+# footer frame
+footer_frame = customtkinter.CTkFrame(main_frame, width=800, height=200)
+footer_frame.grid(row=2, column=0, columnspan=6, padx=5, pady=10)
 
 
 app.grid_columnconfigure(0, weight=1)

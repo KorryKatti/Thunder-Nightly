@@ -10,7 +10,8 @@ customtkinter.set_default_color_theme("themes/cyberpunk.json")
 
 # Function to close window after a delay
 def close_window(window):
-    window.after(3000, window.destroy)  # Close window after 3000 milliseconds (3 seconds)
+    window.after(3000, window.destroy)  # Close window after 3000 milliseconds (3 seconds) and open main file
+    os.system("python main.py") # TODO : review this file directory
 
 # Function to generate a persistent identifier (UUID) for the user
 def generate_user_id():
