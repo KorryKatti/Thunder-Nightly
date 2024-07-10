@@ -1,6 +1,5 @@
 import customtkinter
 import json
-import time
 import os
 import uuid
 import requests
@@ -10,8 +9,11 @@ customtkinter.set_default_color_theme("themes/cyberpunk.json")
 
 # Function to close window after a delay
 def close_window(window):
-    window.after(3000, window.destroy)  # Close window after 3000 milliseconds (3 seconds) and open main file
-    os.system("python main.py") # TODO : review this file directory
+    def destroy_and_launch():
+        window.destroy()
+        os.system("python newindex.py")  # Launch main file after window closes
+
+    window.after(3000, destroy_and_launch)  # Close window after 3000 milliseconds (3 seconds)
 
 # Function to generate a persistent identifier (UUID) for the user
 def generate_user_id():
@@ -43,11 +45,9 @@ def send_userinfo_to_server(username, email, user_id=None):
 
         if server_response == 231:
             CTkMessagebox(title="Login Success", message="User exists, logging in now", icon="check")
-            close_window(app)
             return True
         elif server_response == 232:
             CTkMessagebox(title="Register Success", message="User does not exist, creating a new user", icon="check")
-            close_window(app)
             return True
         elif server_response == 233:
             CTkMessagebox(title="Error", message="The email you provided didn't match the username", icon="warning")
@@ -69,14 +69,14 @@ def start_app():
     print("Starting app now")
     with open('userdata/userinfo.json', 'r') as file:
         user_data = json.load(file)
-        send_userinfo_to_server(user_data['username'], user_data['email'])
+        if send_userinfo_to_server(user_data['username'], user_data['email'], user_data['user_id']):
+            close_window(app)
 
 def start_app_guest():
     print("Starting app with nothing to send to server")
 
 def check_existing_user():
     if os.path.exists('userdata/userinfo.json'):
-        CTkMessagebox(title="Welcome", message="Already logged in", icon="check")
         start_app()
 
 def submit():
@@ -128,6 +128,7 @@ def no_login():
 
     CTkMessagebox(title="Welcome", message="Logging in with guest credentials", icon="check")
     start_app_guest()
+    close_window(app)
 
 # UI Elements
 title = customtkinter.CTkLabel(app, text="Login or Register", font=("Roboto", 14))
