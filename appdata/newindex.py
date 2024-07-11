@@ -3,6 +3,21 @@ from PIL import Image as PILImage
 from PIL import ImageTk
 from PIL import Image
 import json
+from funx.fetch_data import fetch_server_stats, ping_server
+
+# import server stats
+    # Fetch server stats
+stats = fetch_server_stats()
+if stats:
+    print(f"CPU Usage: {stats['cpu_usage']}%")
+    print(f"Memory Usage: {stats['memory_usage']}%")
+    print(f"Disk Usage: {stats['disk_usage']}%")
+
+    # Ping server
+ping_response = ping_server()
+if ping_response:
+    print("Ping Response:", ping_response)
+
 
 # import user data
 file_path = 'userdata/userinfo.json'
@@ -135,4 +150,11 @@ main_frame.grid_rowconfigure(2, weight=1)
 main_frame.grid_rowconfigure(3, weight=1)
 main_frame.grid_columnconfigure(0, weight=1)
 
-app.mainloop()
+################################################3
+if __name__ == '__main__':
+    server_stats()
+    app.mainloop()
+    
+
+
+
