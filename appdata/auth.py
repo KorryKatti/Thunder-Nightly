@@ -4,6 +4,20 @@ import os
 import uuid
 import requests
 from CTkMessagebox import CTkMessagebox
+from funx.fetch_data import fetch_server_stats, ping_server
+
+# import server stats
+    # Fetch server stats
+stats = fetch_server_stats()
+if stats:
+    print(f"CPU Usage: {stats['cpu_usage']}%")
+    print(f"Memory Usage: {stats['memory_usage']}%")
+    print(f"Disk Usage: {stats['disk_usage']}%")
+
+    # Ping server
+ping_response = ping_server()
+if ping_response:
+    print("Ping Response:", ping_response)
 
 customtkinter.set_default_color_theme("themes/cyberpunk.json")
 

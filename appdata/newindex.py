@@ -106,6 +106,15 @@ all_frame.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
 # heading for all apps
 all_apps = customtkinter.CTkLabel(all_frame, text="All Apps", font=("Roboto", 14), fg_color="transparent")
 all_apps.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
+# search bar
+search_bar = customtkinter.CTkEntry(all_frame, placeholder_text="Search Apps", width=200)
+search_bar.grid(row=0, column=3, padx=5, pady=10, sticky="nsew")
+def on_search(event=None):
+    search_query = search_bar.get()
+    # Perform search operation based on the search query
+    print(search_query)
+
+search_bar.bind("<Return>", on_search)
 
 ##############################################3
 
@@ -152,7 +161,7 @@ main_frame.grid_columnconfigure(0, weight=1)
 
 ################################################3
 if __name__ == '__main__':
-    server_stats()
+    #server_stats()
     app.mainloop()
     
 
