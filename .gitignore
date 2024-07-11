@@ -16,3 +16,4 @@ SSHKEY.pub
 current_location.txt
 appdata/userdata/userinfo.json
 /appdata/userdata
+/appdata/funx/__pycache__
