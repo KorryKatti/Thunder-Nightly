@@ -2,26 +2,31 @@ import customtkinter
 import requests
 import json
 import os
+import random
 
-
-
-# from ../userdata/settings.json get theme name , theme is at ../themes/{themename}.json
-# get themename from settings.json
+# Load initial theme and server from settings.json
 with open("../userdata/settings.json", "r") as f:
     settings = json.load(f)
-    themename = settings["theme"]
-    print(themename)
-    them_file = "../themes/" + themename + ".json"
-    print(them_file)
+    initial_theme = settings.get("theme", "default_theme.json")
+    initial_server = settings.get("server", "127.0.0.1:5000")
+    print(f"Initial theme: {initial_theme}")
+    print(f"Initial server: {initial_server}")
+
+    if initial_theme.endswith(".json"):
+        themename = initial_theme[:-5]  # Remove ".json" as it exists in the setting
+    else:
+        themename = initial_theme
+    them_file = f"../themes/{themename}.json"
+    print(f"Theme file: {them_file}")
     customtkinter.set_default_color_theme(them_file)
 
 app = customtkinter.CTk()
 app.geometry("600x500")
 app.title("Settings For Thunder")
 
-def download_theme():
+def download_theme(theme_url_entry):
     print("Downloading theme...")
-    theme_url = theme_url.get()  # Assuming theme_url is an Entry widget in your GUI
+    theme_url = theme_url_entry.get()
     if not theme_url.endswith(".json"):
         print("Theme URL must end in .json")
         return
@@ -41,8 +46,6 @@ def download_theme():
         except Exception as e:
             print(f"Error downloading theme: {e}")
 
-
-# Functions for button commands
 def theme_button():
     print("Changing theme...")
     clear_widgets()
@@ -50,32 +53,74 @@ def theme_button():
     them_title.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
     them_subtitle = customtkinter.CTkLabel(s_frame, text="Select a theme or download or make a new one:", font=("Arial", 14))
     them_subtitle.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
-    theme_url = customtkinter.CTkEntry(s_frame,placeholder_text="Insert url for theme if you want to download it from a url ( must end in .json)")
-    theme_url.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-    theme_download = customtkinter.CTkButton(s_frame, text="Download Theme", command=download_theme)
+    theme_url_entry = customtkinter.CTkEntry(s_frame, placeholder_text="Insert URL for theme ending in .json")
+    theme_url_entry.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+    theme_download = customtkinter.CTkButton(s_frame, text="Download Theme", command=lambda: download_theme(theme_url_entry))
     theme_download.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
-        # display existing themes
+    # Display existing themes
     them_directory = "../themes"
     files = os.listdir(them_directory)
-    json_file_count = 0
-    for file in files:
-        if file.endswith('.json'):
-            json_file_count += 1
+    json_file_count = sum(1 for file in files if file.endswith('.json'))
     print(json_file_count)
-    for i in range(json_file_count):
-        theme_butt = customtkinter.CTkButton(s_frame, text=files[i], command=lambda f=files[i]: from_preset(f))
-        theme_butt.grid(row=i+4, column=0, padx=10, pady=10, sticky="ew")
-
+    direction = random.choice(["e", "w"])  # randomly choose 'e' or 'w'
+    for i, file in enumerate(files):
+        if file.endswith('.json'):
+            theme_butt = customtkinter.CTkButton(s_frame, text=file, command=lambda f=file: from_preset(f))
+            theme_butt.grid(row=i+4, column=0, padx=10, pady=10, sticky=f"{direction}")
 
 def from_preset(theme_name):
     print(theme_name)
+    with open("../userdata/settings.json", "w") as f:
+        settings["theme"] = theme_name
+        json.dump(settings, f)
+        print("Theme set to " + theme_name)
+        customtkinter.set_default_color_theme(f"../themes/{theme_name}")
+
+def setserver_button():
+    print("Setting server...")
+    clear_widgets()
+    server_title = customtkinter.CTkLabel(s_frame, text="Server Settings", font=("Arial", 20))
+    server_title.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+    server_subtitle = customtkinter.CTkLabel(s_frame, text="Enter the URL for the server:", font=("Arial", 14))
+    server_subtitle.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+    server_url_entry = customtkinter.CTkEntry(s_frame, placeholder_text="Insert URL for server")
+    server_url_entry.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+    server_save_button = customtkinter.CTkButton(s_frame, text="Save Server URL", command=lambda: save_server_url(server_url_entry))
+    server_save_button.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
+    server_url_entry.insert(0, initial_server)
+    server_warning = """
+
+Warning: Changing Server Settings
+
+Changing server settings can affect how Thunder interacts with external services. Please ensure that you have the correct server information before making changes. Incorrect settings may result in connection issues or data loss.
+
+Important Note: Using third-party servers, especially those you do not trust, can pose risks such as potential data exposure. It is recommended to use official servers or your own server to maintain data security.
+
+---
+
+Default Server Options
+
+In case you need to revert changes, here are two default server options:
+
+- Default Server 1: 127.0.0.1:5000
+- Default Server 2: example.com:8080
+
+These options are provided for your convenience in case you encounter issues with server settings. Always ensure the server you use is reliable and secure.
+    """
+    serv_warn = customtkinter.CTkTextbox(s_frame)
+    serv_warn.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+    serv_warn.insert("0.0", server_warning)
+    serv_warn.configure(state="disabled")  # make the textbox read-only
+def save_server_url(server_url_entry):
+    new_server_url = server_url_entry.get()
+    print(f"Saving server URL: {new_server_url}")
+    with open("../userdata/settings.json", "w") as f:
+        settings["server"] = new_server_url
+        json.dump(settings, f)
+        print("Server URL set to " + new_server_url)
 
 def signout_button():
     print("Signing out...")  # Placeholder for sign out functionality
-    clear_widgets()
-
-def setserver_button():
-    print("Setting server...")  # Placeholder for setting server functionality
     clear_widgets()
 
 def fetchuser_button():
@@ -93,7 +138,7 @@ op_frame.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 s_frame = customtkinter.CTkScrollableFrame(app)
 s_frame.grid(row=0, column=1, padx=5, pady=10, sticky="nsew")
 
-# function to clear widgets in s_frame
+# Function to clear widgets in s_frame
 def clear_widgets():
     for widget in s_frame.winfo_children():
         widget.destroy()
@@ -128,13 +173,21 @@ downloading unverified themes or setting up external servers can potentially imp
 
 If you encounter any issues or need assistance, don't hesitate to contact our support team.
 We're here to help you get the most out of Thunder!
-"""
 
-textbox = customtkinter.CTkTextbox(s_frame)
+Note :
+All settings are applied on restarting the client with a few exceptions.
+
+Thank you for using Thunder!
+
+All your settings are in ../userdata/settings.json in case you mess up and app doesn't start.
+"""
+textbox = customtkinter.CTkTextbox(s_frame, width=80, height=275)
 textbox.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 textbox.insert("0.0", friendly_text)
 textbox.configure(state="disabled")  # make the textbox read-only
 s_frame.grid_columnconfigure(0, weight=1)
+s_frame.grid_rowconfigure(0, weight=1)
+
 
 # Start the application loop
 app.mainloop()
