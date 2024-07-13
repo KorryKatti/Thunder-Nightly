@@ -6,12 +6,12 @@ import os
 import random
 
 # Load user info from JSON file
-with open('userinfo.json', 'r') as file:
+with open('../userdata/userinfo.json', 'r') as file:
     user_info = json.load(file)
 
 username = user_info['username']
 email = user_info['email']
-secret_key = user_info['secret_key']
+#secret_key = user_info['secret_key']
 
 # Server URL
 server_url = 'http://duinogame.pythonanywhere.com'

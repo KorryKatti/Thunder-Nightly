@@ -1,7 +1,10 @@
 import requests
+import json
 
+with open('userdata/settings.json', 'r') as f:
+    settings = json.load(f)
+    BASE_URL = settings['server']
 
-BASE_URL = 'http://127.0.0.1:5000'
 
 def fetch_server_stats():
     try:
