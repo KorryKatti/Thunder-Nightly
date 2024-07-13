@@ -108,9 +108,10 @@ In case you need to revert changes, here are two default server options:
 These options are provided for your convenience in case you encounter issues with server settings. Always ensure the server you use is reliable and secure.
     """
     serv_warn = customtkinter.CTkTextbox(s_frame)
-    serv_warn.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+    serv_warn.grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
     serv_warn.insert("0.0", server_warning)
     serv_warn.configure(state="disabled")  # make the textbox read-only
+
 def save_server_url(server_url_entry):
     new_server_url = server_url_entry.get()
     print(f"Saving server URL: {new_server_url}")
@@ -122,6 +123,17 @@ def save_server_url(server_url_entry):
 def signout_button():
     print("Signing out...")  # Placeholder for sign out functionality
     clear_widgets()
+    sign_out_head = customtkinter.CTkLabel(s_frame,text="Signing Out will remove your credentials from the system")
+    sign_out_head.grid(row=0,column=0,padx=10,pady=10,sticky="nsew")
+    sign_out_butt = customtkinter.CTkButton(s_frame,text="Click me to sign out",command=sign_butt)
+    sign_out_butt.grid(row=1,column=0,padx=10,pady=10,sticky="ew")
+    sign_out_rem = customtkinter.CTkLabel(s_frame,text="Restart app to see changes")
+    sign_out_rem.grid(row=2,column=0,padx=10,pady=10,sticky="ew")
+
+def sign_butt():
+    # delete ../userdata/userinfo.json and ../userdata/userid.txt
+    os.remove("../userdata/userinfo.json")
+    os.remove("../userdata/userid.txt")
 
 def fetchuser_button():
     print("Fetching user data...")  # Placeholder for fetching user data functionality
