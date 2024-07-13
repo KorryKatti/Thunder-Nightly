@@ -1,3 +1,8 @@
+import multiprocessing
+import subprocess
+import os
+import sys
+import time
 import customtkinter
 from PIL import Image as PILImage
 from PIL import ImageTk
@@ -47,9 +52,17 @@ def devmenu(choice):
 
 def cl_settings():
     print("settings pressed")
+    # cd into that directory first and then  launch funx/sett_win.py in a differnt process
+    os.chdir("funx")
+    subprocess.Popen(["python", "sett_win.py"])
+    os.chdir("..")
 
 def launch_mirage():
     print("launching mirage")
+    # cd into that directory first and then  launch mirage/client.py in a differnt process
+    os.chdir("mirage")
+    subprocess.Popen(["python", "client.py"])
+    os.chdir("..")
 
 # The option menus on the top
 homemenu = customtkinter.CTkOptionMenu(app, values=["Home", "Client Update", "Quit"], command=homemenu)

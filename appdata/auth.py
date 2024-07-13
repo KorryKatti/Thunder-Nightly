@@ -2,19 +2,24 @@ import customtkinter
 import json
 import os
 import uuid
+import time
 import requests
 from CTkMessagebox import CTkMessagebox
 from funx.fetch_data import fetch_server_stats, ping_server
 
-# import server stats
-    # Fetch server stats
+# Set base URL for server
+with open('userdata/settings.json', 'r') as f:
+    settings = json.load(f)
+    base_url = settings['server']
+
+# Fetch server stats
 stats = fetch_server_stats()
 if stats:
     print(f"CPU Usage: {stats['cpu_usage']}%")
     print(f"Memory Usage: {stats['memory_usage']}%")
     print(f"Disk Usage: {stats['disk_usage']}%")
 
-    # Ping server
+# Ping server
 ping_response = ping_server()
 if ping_response:
     print("Ping Response:", ping_response)
@@ -45,7 +50,11 @@ def generate_user_id():
 
 # Function to send user info to a server for cross-checking
 def send_userinfo_to_server(username, email, user_id=None):
-    url = 'http://127.0.0.1:5000/user'
+    if username == "Guest":
+        print("Guest login, no need to cross-check with server.")
+        return True
+
+    url = f'{base_url}/user'
     payload = {
         'username': username,
         'email': email
@@ -88,10 +97,18 @@ def start_app():
 
 def start_app_guest():
     print("Starting app with nothing to send to server")
+    CTkMessagebox(title="Welcome", message="Logging in with guest credentials", icon="check")
+    time.sleep(2)
+    close_window(app)
 
 def check_existing_user():
     if os.path.exists('userdata/userinfo.json'):
-        start_app()
+        with open('userdata/userinfo.json', 'r') as file:
+            user_data = json.load(file)
+            if user_data['username'] == "Guest":
+                start_app_guest()
+            else:
+                start_app()
 
 def submit():
     username_text = username.get()
