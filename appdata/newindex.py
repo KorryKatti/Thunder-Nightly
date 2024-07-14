@@ -1,4 +1,5 @@
 import multiprocessing
+import webview
 import subprocess
 import os
 import sys
@@ -46,6 +47,17 @@ def libmenu(choice):
 
 def commmenu(choice):
     print(choice)
+    if choice == "Image Board":
+        webview.create_window("Image Board", "http://korrykatti.github.io/others/thunder/image.html")
+        webview.start()
+    elif choice == "Thunder Halls":
+        webview.create_window("Thunder Halls", "http://korrykatti.github.io/others/thunder/halls.html")
+        webview.start()
+    elif choice == "Community":
+        webview.create_window("Community", "http://korrykatti.github.io/others/thunder/community.html")
+        webview.start()
+
+
 
 def devmenu(choice):
     print(choice)
