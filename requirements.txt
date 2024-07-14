@@ -6,6 +6,8 @@ customtkinter==5.2.2
 darkdetect==0.8.0
 idna==3.6
 pywebview
+pywebview[qt]
+pyqtwebengine
 Markdown==3.6
 packaging==24.0
 pillow==10.2.0
