@@ -14,7 +14,11 @@ email = user_info['email']
 #secret_key = user_info['secret_key']
 
 # Server URL
-server_url = 'http://duinogame.pythonanywhere.com'
+# Set base URL for server
+with open('../userdata/settings.json', 'r') as f:
+    settings = json.load(f)
+    server_url = settings['server']
+
 
 current_room = None
 last_message_id = -1
