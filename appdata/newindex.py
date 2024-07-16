@@ -346,4 +346,3 @@ download_htmls_as_json()
 if __name__ == '__main__':
 
     app.mainloop()
-
