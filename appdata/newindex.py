@@ -74,55 +74,6 @@ with open(file_path, 'r') as file:
 username = data['username']
 print(f"Username: {username}")
 
-def app_labels():
-    # get app data from data/{app_id}.json
-    for app_id in range(1, 100000):
-        app_id_str = f"{app_id:05}"
-        file_path = f'data/{app_id_str}.json'
-
-        if os.path.exists(file_path):
-            with open(file_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-
-            # Extract all details
-            app_id = data['app_id']
-            app_name = data['app_name']
-            icon_url = data['icon_url']
-            version = data['version']
-            repo_url = data['repo_url']
-            main_file = data['main_file']
-            description = data['description']
-
-# Create a label in all_frame for each app from data/{app_id}.json
-def app_labels():
-    # get app data from data/{app_id}.json
-    for app_id in range(1, 100000):
-        app_id_str = f"{app_id:05}"
-        file_path = f'data/{app_id_str}.json'
-
-        if os.path.exists(file_path):
-            with open(file_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-
-            # Extract all details
-            app_id = data['app_id']
-            app_name = data['app_name']
-            icon_url = data['icon_url']
-            version = data['version']
-            repo_url = data['repo_url']
-            main_file = data['main_file']
-            description = data['description']
-
-            app_label_frame = customtkinter.CTkFrame(all_frame)
-            for i in range(1,100000):
-                app_label_frame.grid(row=i, column=0, padx=5, pady=10, sticky="nsew")
-
-            app_label_frame.grid_rowconfigure(0, weight=1)  # Ensure app_label_frame expands vertically
-
-            # labels for each app in app_label_frame
-            labelofapp = customtkinter.CTkLabel(app_label_frame, text=app_name, font=("Roboto", 14), fg_color="transparent")
-            labelofapp.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
-
 
 
 # Basic window which fits 800x640
@@ -130,7 +81,6 @@ app = customtkinter.CTk()
 app.title("Thunder Client")
 app.geometry("1024x640")
 
-# Functions for apps
 def homemenu(choice):
     print(choice)
     if choice == "Home":
@@ -158,6 +108,37 @@ def homemenu(choice):
             print(search_query)
 
         search_bar.bind("<Return>", on_search)
+
+        # Call app_labels function to populate all_frame with app details
+        app_labels(all_frame)
+
+no_image_url_prov = "https://cdn.vectorstock.com/i/500p/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg"
+
+def app_labels(all_frame):
+    data_dir = "data"
+    filenames = sorted(os.listdir(data_dir), reverse=True)
+    for filename in filenames:
+        if filename.endswith(".json"):
+            try:
+                with open(os.path.join(data_dir, filename), "r") as f:
+                    app_data = json.load(f)
+                    app_id = app_data.get("app_id", "Unknown")
+                    app_name = app_data.get("app_data","Unknown")
+                    icon_url = app_data.get("icon_url",f"{no_image_url_prov}")
+                    version = app_data.get("version","Unknown")
+                    repo_url = app_data.get("repo_url","Unknown")
+                    main_file = app_data.get("main_file","Unknown")
+                    description = app_data.get("description","Unknown")
+
+                    app_labels_for_each = customtkinter.CTkFrame(all_frame)
+                    app_labels_for_each.grid(row=1,column=0)
+
+                    test_label = customtkinter.CTkLabel(app_labels,text="Hi how are you")
+                    test_label.grid(row=0,column=0,padx=10,pady=10,sticky="nsew")
+            except Exception as e:
+                print(f"Error processing JSON file {filename}: {e}")
+
+
 
 def libmenu(choice):
     if choice == "Library":
