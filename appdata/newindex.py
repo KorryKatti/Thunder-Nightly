@@ -1,8 +1,21 @@
+"""TODO:
+1. fix mirage
+2. fix library
+3. fix labels
+4. get enough sleep
+"""
+
+
+import markdown
+from tkinterhtml import HtmlFrame
 import multiprocessing
 import webview
+from tkinter import scrolledtext
 import subprocess
+import threading
 import os
 import sys
+from tkhtmlview import HTMLLabel
 import time
 import customtkinter
 from PIL import Image as PILImage
@@ -13,6 +26,23 @@ import json
 from funx.fetch_data import fetch_server_stats, ping_server
 from bs4 import BeautifulSoup
 import time
+
+# Load the theme from userdata/settings.json
+try:
+    with open('userdata/settings.json', 'r') as f:
+        data = json.load(f)
+        theme_name = data.get('theme', 'cyberpunk.json')  # Default theme if 'theme' key is missing
+        theme_path = f'themes/{theme_name}'
+
+        # Set the custom tkinter theme
+        customtkinter.set_default_color_theme(theme_path)
+
+except FileNotFoundError:
+    print("Settings file not found.")
+except KeyError:
+    print("Theme key 'theme' not found in settings file.")
+except Exception as e:
+    print(f"Error loading and setting theme: {e}")
 
 
 ####################################################3
@@ -75,6 +105,103 @@ username = data['username']
 print(f"Username: {username}")
 
 
+def view_details(app_id):
+    global scrolledtext  # Ensure scrolledtext is available in this scope
+
+    # Clear the main frame
+    for widget in main_frame.winfo_children():
+        widget.destroy()
+
+    # Load app details from JSON file
+    json_file_path = f"data/{app_id}.json"
+    try:
+        with open(json_file_path, "r") as f:
+            app_data = json.load(f)
+            app_id = app_data.get("app_id", "Unknown")
+            app_name = app_data.get("app_name", "Unknown")
+            icon_url = app_data.get("icon_url", no_image_url_prov)
+            version = app_data.get("version", "Unknown")
+            repo_url = app_data.get("repo_url", "Unknown")
+            main_file = app_data.get("main_file", "Unknown")
+            description = app_data.get("description", "Unknown")
+
+            # Display app details
+            app_name_label = customtkinter.CTkLabel(main_frame, text=f"App Name: {app_name}", font=("Roboto", 14), fg_color="transparent")
+            app_name_label.grid(row=1, column=0, padx=5, pady=10, sticky="w")
+
+            version_label = customtkinter.CTkLabel(main_frame, text=f"Version: {version}", font=("Roboto", 14), fg_color="transparent")
+            version_label.grid(row=2, column=1, padx=5, pady=10, sticky="e")
+
+            description_label = customtkinter.CTkLabel(main_frame, text=f"Description: {description}", font=("Roboto", 14), fg_color="transparent")
+            description_label.grid(row=2, column=0, columnspan=2, padx=5, pady=10, sticky="w")
+
+            repo_label = customtkinter.CTkLabel(main_frame, text=f"You are downloading this app from: {repo_url}. We do not scan the apps for malicious code; you can report if you find any app with such.", font=("Roboto", 14), fg_color="transparent")
+            repo_label.grid(row=3, column=0, padx=5, pady=10, sticky="w")
+
+            # Display app icon
+            try:
+                response = requests.get(icon_url, stream=True)
+                if response.status_code == 200:
+                    image = Image.open(response.raw)
+                else:
+                    image = Image.open(no_image_url_prov)
+            except Exception:
+                image = Image.open(no_image_url_prov)
+
+            image = image.resize((100, 100))
+            photo = ImageTk.PhotoImage(image)
+            icon_label = customtkinter.CTkLabel(main_frame, image=photo, text="")
+            icon_label.image = photo
+            icon_label.grid(row=1, column=1, padx=5, pady=10, sticky="e")
+
+            main_file_label = customtkinter.CTkLabel(main_frame, text=f"This app runs from: {main_file}", font=("Roboto", 14), fg_color="transparent")
+            main_file_label.grid(row=4, column=0, padx=5, pady=10, sticky="w")
+
+            # Back button
+            back_button = customtkinter.CTkButton(main_frame, text="Back", command=lambda: back_to_home())
+            back_button.grid(row=5, column=0, columnspan=2, padx=5, pady=10, sticky="e")
+
+            # Create a placeholder for the README.md content ( chatgpt wrote this )
+            readme_frame = customtkinter.CTkFrame(main_frame, height=200)
+            readme_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
+            readme_label = scrolledtext.ScrolledText(readme_frame, wrap="word", width=80, height=10)
+            readme_label.pack(fill="both", expand=True)
+
+            # Loading message while fetching README
+            loading_label = customtkinter.CTkLabel(readme_frame, text="Loading README...If this fails then probably the author hasn't put a file for it", font=("Roboto", 14), fg_color="transparent")
+            loading_label.pack(fill="both", expand=True)
+
+            # Load the README.md content asynchronously
+            def load_readme():
+                readme_url = f"{repo_url}/raw/main/thunder.md"
+                try:
+                    readme_response = requests.get(readme_url)
+                    if readme_response.status_code == 200:
+                        readme_md = readme_response.text
+                        readme_html = markdown.markdown(readme_md)
+                        # Clear loading message and display README content
+                        loading_label.pack_forget()
+                        readme_label.delete(1.0, "end")  # Clear previous content
+                        readme_label.insert("end", readme_html)  # Insert new HTML content
+                    else:
+                        raise Exception("Failed to load README.md")
+                except Exception as e:
+                    loading_label.configure(text=f"Error loading README.md: {e}")
+
+            threading.Thread(target=load_readme).start()
+
+    except FileNotFoundError:
+        print(f"Error: JSON file {json_file_path} not found.")
+    except Exception as e:
+        print(f"Error loading app details for {app_id}: {e}")
+
+def back_to_home():
+    # Clear the main frame
+    for widget in main_frame.winfo_children():
+        widget.destroy()
+
+    # Call the home menu function
+    homemenu("Home")
 
 # Basic window which fits 800x640
 app = customtkinter.CTk()
@@ -93,14 +220,43 @@ def homemenu(choice):
         username_label.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 
         # All frame
-        all_frame = customtkinter.CTkScrollableFrame(main_frame)
+        all_frame = customtkinter.CTkScrollableFrame(main_frame,width=700)
         all_frame.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
         # Heading for all apps
-        all_apps = customtkinter.CTkLabel(all_frame, text="All Apps", font=("Roboto", 14), fg_color="transparent")
-        all_apps.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
+        all_apps = customtkinter.CTkLabel(all_frame, text=" [ All Apps ]", font=("Roboto", 20), fg_color="transparent")
+        all_apps.grid(row=0, column=0, padx=5, pady=10, sticky="w")
         # Search bar
         search_bar = customtkinter.CTkEntry(all_frame, placeholder_text="Search Apps", width=200)
-        search_bar.grid(row=0, column=3, padx=5, pady=10, sticky="nsew")
+        search_bar.grid(row=0, column=25, padx=5, pady=10, sticky="e")
+
+        # Footer frame
+        footer_frame = customtkinter.CTkFrame(main_frame)
+        footer_frame.grid(row=3, column=0, padx=5, pady=10, sticky="nsew")
+
+        # Footer information
+        footer = customtkinter.CTkLabel(footer_frame, text="Made with ❤️ by @korrykatti", font=("Roboto", 14), text_color="cyan", fg_color="transparent")
+        footer.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
+
+        # More information on the right
+        more_info = customtkinter.CTkLabel(footer_frame, text="Thunder - Python App Store", font=("Roboto", 18), text_color="cyan", fg_color="transparent")
+        more_info.grid(row=0, column=1, padx=900, pady=1, sticky="nsew")
+
+        # Last bit of information
+        last_infoI = customtkinter.CTkLabel(footer_frame, text="thunderenv.glitch.me", font=("Roboto", 10), text_color="#F7879A", fg_color="transparent")
+        last_infoI.grid(row=1, column=1, padx=900, pady=1, sticky="nsew")
+
+        last_infoII = customtkinter.CTkLabel(footer_frame, text="github.com/korrykatti/Thunder", font=("Roboto", 10), text_color="#F7879A", fg_color="transparent")
+        last_infoII.grid(row=2, column=1, padx=900, pady=1, sticky="nsew")
+
+        logo = PILImage.open("media/icon.png")
+        logoimage = ImageTk.PhotoImage(logo)
+        ctk_logo = customtkinter.CTkImage(light_image=logo, dark_image=logo, size=(50, 50))
+        logolabel = customtkinter.CTkLabel(footer_frame, image=ctk_logo, text="")
+        logolabel.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+
+        last_infoIII = customtkinter.CTkLabel(footer_frame, text="Thank you for using Thunder!", font=("Roboto", 10), text_color="#F7879A", fg_color="transparent")
+        last_infoIII.grid(row=0, column=0, padx=5, pady=1, sticky="nsew")
+
 
         def on_search(event=None):
             search_query = search_bar.get()
@@ -117,24 +273,54 @@ no_image_url_prov = "https://cdn.vectorstock.com/i/500p/65/30/default-image-icon
 def app_labels(all_frame):
     data_dir = "data"
     filenames = sorted(os.listdir(data_dir), reverse=True)
+
+    # Counter for grid row
+    row_counter = 1
+
     for filename in filenames:
         if filename.endswith(".json"):
             try:
                 with open(os.path.join(data_dir, filename), "r") as f:
                     app_data = json.load(f)
                     app_id = app_data.get("app_id", "Unknown")
-                    app_name = app_data.get("app_data","Unknown")
-                    icon_url = app_data.get("icon_url",f"{no_image_url_prov}")
-                    version = app_data.get("version","Unknown")
-                    repo_url = app_data.get("repo_url","Unknown")
-                    main_file = app_data.get("main_file","Unknown")
-                    description = app_data.get("description","Unknown")
+                    app_name = app_data.get("app_name", "Unknown")
+                    icon_url = app_data.get("icon_url", f"{no_image_url_prov}")
+                    version = app_data.get("version", "Unknown")
+                    repo_url = app_data.get("repo_url", "Unknown")
+                    main_file = app_data.get("main_file", "Unknown")
+                    description = app_data.get("description", "Unknown")
 
-                    app_labels_for_each = customtkinter.CTkFrame(all_frame)
-                    app_labels_for_each.grid(row=1,column=0)
+                    app_labels_for_each = customtkinter.CTkFrame(all_frame,width=700)
+                    app_labels_for_each.grid(row=row_counter, column=0)
 
-                    test_label = customtkinter.CTkLabel(app_labels,text="Hi how are you")
-                    test_label.grid(row=0,column=0,padx=10,pady=10,sticky="nsew")
+                    # Separator line above app details
+                    separator_above = customtkinter.CTkLabel(app_labels_for_each, text="-")
+                    separator_above.grid(row=1, column=11, columnspan=4, padx=5, pady=10, sticky="n")
+
+                    # Display app name
+                    app_name_label = customtkinter.CTkLabel(app_labels_for_each, text=f"App Name: {app_name}", font=("Roboto", 14), fg_color="transparent")
+                    app_name_label.grid(row=2, column=0, padx=5, pady=10,sticky="w")
+
+                    # Display version
+                    version_label = customtkinter.CTkLabel(app_labels_for_each, text=f"Version: {version}", font=("Roboto", 14), fg_color="transparent")
+                    version_label.grid(row=2, column=10, padx=5, pady=10,sticky="e")
+
+                    # Display description
+                    description_label = customtkinter.CTkLabel(app_labels_for_each, text=f"Description: {description}", font=("Roboto", 14), fg_color="transparent")
+                    description_label.grid(row=3, column=0, columnspan=2, padx=5, pady=10,sticky="w")
+
+                    # download button
+                    download_button = customtkinter.CTkButton(app_labels_for_each, text="View Details", command=lambda app_id=app_id: view_details(app_id))
+
+                    download_button.grid(row=3, column=10, padx=5, pady=10, sticky="e")
+
+                    # Separator line below app details
+                    separator_below = customtkinter.CTkLabel(app_labels_for_each, text="-")
+                    separator_below.grid(row=4, column=11, columnspan=2, padx=5, pady=10, sticky="s")
+
+                    # Increment row counter for next app
+                    row_counter += 5  # Adjusted for the 4 rows used (including separators)
+
             except Exception as e:
                 print(f"Error processing JSON file {filename}: {e}")
 
@@ -281,33 +467,6 @@ main_frame.grid(row=1, column=0, columnspan=6, padx=5, pady=5, sticky="nsew")
 banner = customtkinter.CTkLabel(main_frame, image=ctk_banner, text="")
 banner.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
-# Footer frame
-footer_frame = customtkinter.CTkFrame(main_frame)
-footer_frame.grid(row=3, column=0, padx=5, pady=10, sticky="nsew")
-
-# Footer information
-footer = customtkinter.CTkLabel(footer_frame, text="Made with ❤️ by @korrykatti", font=("Roboto", 14), text_color="cyan", fg_color="transparent")
-footer.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
-
-# More information on the right
-more_info = customtkinter.CTkLabel(footer_frame, text="Thunder - Python App Store", font=("Roboto", 18), text_color="cyan", fg_color="transparent")
-more_info.grid(row=0, column=1, padx=900, pady=1, sticky="nsew")
-
-# Last bit of information
-last_infoI = customtkinter.CTkLabel(footer_frame, text="thunderenv.glitch.me", font=("Roboto", 10), text_color="#F7879A", fg_color="transparent")
-last_infoI.grid(row=1, column=1, padx=900, pady=1, sticky="nsew")
-
-last_infoII = customtkinter.CTkLabel(footer_frame, text="github.com/korrykatti/Thunder", font=("Roboto", 10), text_color="#F7879A", fg_color="transparent")
-last_infoII.grid(row=2, column=1, padx=900, pady=1, sticky="nsew")
-
-logo = PILImage.open("media/icon.png")
-logoimage = ImageTk.PhotoImage(logo)
-ctk_logo = customtkinter.CTkImage(light_image=logo, dark_image=logo, size=(50, 50))
-logolabel = customtkinter.CTkLabel(footer_frame, image=ctk_logo, text="")
-logolabel.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-
-last_infoIII = customtkinter.CTkLabel(footer_frame, text="Thank you for using Thunder!", font=("Roboto", 10), text_color="#F7879A", fg_color="transparent")
-last_infoIII.grid(row=0, column=0, padx=5, pady=1, sticky="nsew")
 
 # Configure grid to be responsive
 for i in range(5):
