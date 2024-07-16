@@ -7,7 +7,7 @@ import random
 # Load initial theme and server from settings.json
 with open("../userdata/settings.json", "r") as f:
     settings = json.load(f)
-    initial_theme = settings.get("theme", "default_theme.json")
+    initial_theme = settings.get("theme", "cyberpunk.json")
     initial_server = settings.get("server", "127.0.0.1:5000")
     print(f"Initial theme: {initial_theme}")
     print(f"Initial server: {initial_server}")

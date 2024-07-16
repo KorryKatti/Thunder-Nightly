@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, simpledialog
+from tkinter import scrolledtext, simpledialog, messagebox
 import requests
 import json
 import os
@@ -103,7 +103,31 @@ def load_users_in_room(room_name):
         users = response.json()
         user_list.delete(0, tk.END)
         for user in users:
-            user_list.insert(tk.END, user)
+            user_button = tk.Button(user_list, text=user, bg='#222', fg='white', relief='flat', bd=0,
+                                    command=lambda u=user: show_user_info_popup(u))
+            user_button.pack(fill=tk.X, padx=5, pady=2)
+
+# Function to show user information popup
+def show_user_info_popup(username):
+    popup = tk.Toplevel()
+    popup.title(f"User Info: {username}")
+    popup.geometry("300x150")
+    popup.configure(bg='#2a2a2a')
+
+    # Display username
+    username_label = tk.Label(popup, text=f"Username: {username}", bg='#2a2a2a', fg='white', font=('Arial', 12))
+    username_label.pack(pady=10)
+
+    # Display random quote
+    quotes = [
+        "1 is not equal to 1",
+        "The future belongs to those who believe in the beauty of their dreams.",
+        "In the middle of difficulty lies opportunity.",
+        "It does not matter how slowly you go as long as you do not stop."
+    ]
+    random_quote = random.choice(quotes)
+    quote_label = tk.Label(popup, text=random_quote, bg='#2a2a2a', fg='white', font=('Arial', 10))
+    quote_label.pack(pady=5)
 
 # Function to load chat history from a room file
 def load_chat_history(room_name):
