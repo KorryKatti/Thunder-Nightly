@@ -4,6 +4,7 @@ import os
 import uuid
 import time
 import requests
+
 from CTkMessagebox import CTkMessagebox
 from funx.fetch_data import fetch_server_stats, ping_server
 
@@ -34,54 +35,15 @@ def close_window(window):
 
     window.after(3000, destroy_and_launch)  # Close window after 3000 milliseconds (3 seconds)
 
-# Function to generate a persistent identifier (UUID) for the user
-def generate_user_id():
-    if not os.path.exists('userdata'):
-        os.makedirs('userdata')
-
-    if os.path.exists('userdata/userid.txt'):
-        with open('userdata/userid.txt', 'r') as file:
-            user_id = file.read().strip()
-    else:
-        user_id = str(uuid.uuid4())
-        with open('userdata/userid.txt', 'w') as file:
-            file.write(user_id)
-    return user_id
-
-# Function to send user info to a server for cross-checking
-def send_userinfo_to_server(username, email, user_id=None):
-    if username == "Guest":
-        print("Guest login, no need to cross-check with server.")
-        return True
-
-    url = f'{base_url}/user'
-    payload = {
-        'username': username,
-        'email': email
+# Function to save user data (username, email, user_id) locally
+def save_user_data_locally(username, email, user_id):
+    user_data = {
+        "username": username,
+        "email": email,
+        "user_id": user_id
     }
-    if user_id:
-        payload['user_id'] = user_id
-
-    try:
-        response = requests.post(url, json=payload)
-        server_response = response.json().get('status')
-
-        if server_response == 231:
-            CTkMessagebox(title="Login Success", message="User exists, logging in now", icon="check")
-            return True
-        elif server_response == 232:
-            CTkMessagebox(title="Register Success", message="User does not exist, creating a new user", icon="check")
-            return True
-        elif server_response == 233:
-            CTkMessagebox(title="Error", message="The email you provided didn't match the username", icon="warning")
-            return False
-        else:
-            CTkMessagebox(title="Error", message="Some error occurred", icon="warning")
-            return False
-    except requests.exceptions.RequestException as e:
-        print(f"Error making request: {e}")
-        CTkMessagebox(title="Error", message="Failed to connect to server", icon="warning")
-        return False
+    with open('userdata/userinfo.json', 'w') as file:
+        json.dump(user_data, file)
 
 # Create main application window
 app = customtkinter.CTk()
@@ -92,8 +54,11 @@ def start_app():
     print("Starting app now")
     with open('userdata/userinfo.json', 'r') as file:
         user_data = json.load(file)
-        if send_userinfo_to_server(user_data['username'], user_data['email'], user_data['user_id']):
+        if 'user_id' in user_data:
+            CTkMessagebox(title="Welcome", message="Welcome To Thunder", icon="check")
             close_window(app)
+        else:
+            CTkMessagebox(title="Error", message="User ID not found locally", icon="warning")
 
 def start_app_guest():
     print("Starting app with nothing to send to server")
@@ -105,10 +70,11 @@ def check_existing_user():
     if os.path.exists('userdata/userinfo.json'):
         with open('userdata/userinfo.json', 'r') as file:
             user_data = json.load(file)
-            if user_data['username'] == "Guest":
-                start_app_guest()
-            else:
-                start_app()
+            if 'user_id' in user_data:
+                if user_data['username'] == "Guest":
+                    start_app_guest()
+                else:
+                    start_app()
 
 def submit():
     username_text = username.get()
@@ -117,33 +83,37 @@ def submit():
         CTkMessagebox(title="Error", message="The email you entered is incorrect", icon="warning")
         return
 
-    user_id = generate_user_id()  # Get or generate persistent user identifier
+    url = f'{base_url}/user'
+    payload = {
+        'username': username_text,
+        'email': email_text
+    }
 
-    # Check if userinfo.json already exists
-    if os.path.exists('userdata/userinfo.json'):
-        with open('userdata/userinfo.json', 'r') as file:
-            user_data = json.load(file)
-            user_data['user_id'] = user_id  # Add user_id to existing data
-    else:
-        user_data = {
-            "username": username_text,
-            "email": email_text,
-            "user_id": user_id  # Store user_id along with initial data
-        }
+    try:
+        response = requests.post(url, json=payload)
+        data = response.json()
 
-    # Send user info to server first
-    if send_userinfo_to_server(user_data['username'], user_data['email'], user_data['user_id']):
-        if not os.path.exists('userdata'):
-            os.makedirs('userdata')
+        if response.status_code == 200:
+            status = data.get('status')
+            if status == 231 or status == 232:  # Login successful or user registered successfully
+                user_id = data.get('user_id')
+                save_user_data_locally(username_text, email_text, user_id)  # Save user data received from server
+                CTkMessagebox(title="Welcome", message=data.get('message'), icon="check")
+                close_window(app)
+            elif status == 233:
+                CTkMessagebox(title="Error", message="Invalid user credentials", icon="warning")
+            else:
+                CTkMessagebox(title="Error", message="Some error occurred", icon="warning")
+        else:
+            CTkMessagebox(title="Error", message="Failed to connect to server", icon="warning")
 
-        with open('userdata/userinfo.json', 'w') as file:
-            json.dump(user_data, file)
-
-        CTkMessagebox(title="Welcome", message="Welcome To Thunder", icon="check")
-        close_window(app)
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        CTkMessagebox(title="Error", message="Failed to connect to server", icon="warning")
 
 def no_login():
-    user_id = generate_user_id()  # Get or generate persistent user identifier
+    user_id = str(uuid.uuid4())  # Generate a unique user ID for guest
+    save_user_data_locally("Guest", "guest@thunder.korrykatti.site", user_id)
 
     guest_data = {
         "username": "Guest",
