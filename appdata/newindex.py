@@ -159,7 +159,7 @@ def view_details(app_id):
 
             # Back button
             back_button = customtkinter.CTkButton(main_frame, text="Back", command=lambda: back_to_home())
-            back_button.grid(row=5, column=0, columnspan=2, padx=5, pady=10, sticky="e")
+            back_button.grid(row=5, column=0, padx=5, pady=10, sticky="e")
 
             # Create a placeholder for the README.md content ( chatgpt wrote this )
             readme_frame = customtkinter.CTkFrame(main_frame, height=200)
@@ -171,6 +171,13 @@ def view_details(app_id):
             loading_label = customtkinter.CTkLabel(readme_frame, text="Loading README...If this fails then probably the author hasn't put a file for it", font=("Roboto", 14), fg_color="transparent")
             loading_label.pack(fill="both", expand=True)
 
+            # comment section
+            comment_label = customtkinter.CTkLabel(main_frame,text="Comments",font=("Calibri",16),fg_color="transparent")
+            comment_label.grid(row=8,column=0,padx=5,pady=10,sticky="w")
+            comments_frame = customtkinter.CTkScrollableFrame(main_frame)
+            comments_frame.grid(row=9,column=0,columnspan=2,padx=5,pady=10,sticky="ew")
+            comingsoon = customtkinter.CTkLabel(comments_frame,text="Coming soon.............")
+            comingsoon.grid(row=0,column=0,padx=5,pady=10,sticky="w")
             # Load the README.md content asynchronously
             def load_readme():
                 readme_url = f"{repo_url}/raw/main/thunder.md"
@@ -200,6 +207,7 @@ def back_to_home():
     for widget in main_frame.winfo_children():
         widget.destroy()
 
+
     # Call the home menu function
     homemenu("Home")
 
@@ -211,9 +219,12 @@ app.geometry("1024x640")
 def homemenu(choice):
     print(choice)
     if choice == "Home":
+        for widget in main_frame.winfo_children():
+            widget.destroy()
         # Recommendations frame
         recommendations_frame = customtkinter.CTkScrollableFrame(main_frame)
         recommendations_frame.grid(row=1, column=0, padx=5, pady=10, sticky="nsew")
+        recommend_labels(recommendations_frame)
         # Welcome the user
         labelofuser = f" Recommendations for {username} :"
         username_label = customtkinter.CTkLabel(recommendations_frame, text=labelofuser, font=("Roboto", 14), fg_color="transparent")
@@ -270,6 +281,10 @@ def homemenu(choice):
 
 no_image_url_prov = "https://cdn.vectorstock.com/i/500p/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg"
 
+def search_results(search_query):
+    # Perform search operation based on the search query
+    print(search_query)
+
 def app_labels(all_frame):
     data_dir = "data"
     filenames = sorted(os.listdir(data_dir), reverse=True)
@@ -321,6 +336,61 @@ def app_labels(all_frame):
                     # Increment row counter for next app
                     row_counter += 5  # Adjusted for the 4 rows used (including separators)
 
+            except Exception as e:
+                print(f"Error processing JSON file {filename}: {e}")
+
+
+def recommend_labels(recommendations_frame):
+    # Open and read the JSON file
+    with open("aegis/base.json", "r") as f:
+        data = json.load(f)
+
+    # Print the IDs
+    for app_id in data:
+        print(app_id)
+    data_dir = "data"
+    filenames = sorted(os.listdir(data_dir), reverse=True)
+
+    # Counter for grid row and column
+    row_counter = 1
+    column_counter = 1
+    max_columns = 5
+
+    for filename in filenames:
+        if filename.endswith(".json"):
+            try:
+                with open(os.path.join(data_dir, filename), "r") as f:
+                    app_data = json.load(f)
+                    app_id = app_data.get("app_id", "Unknown")
+                    app_name = app_data.get("app_name", "Unknown")
+                    version = app_data.get("version", "Unknown")
+
+                    if app_id in data:
+                        recomm_labels_for_each = customtkinter.CTkFrame(recommendations_frame, width=200, height=200)
+                        recomm_labels_for_each.grid(row=row_counter, column=column_counter, padx=10, pady=10)
+
+                        app_name_label = customtkinter.CTkLabel(recomm_labels_for_each, text=f"{app_name}", font=("Roboto", 14), fg_color="transparent")
+                        app_name_label.grid(row=0, column=0, padx=5, pady=5)
+
+                        version_label = customtkinter.CTkLabel(recomm_labels_for_each, text=f"Version: {version}", font=("Roboto", 12), fg_color="transparent")
+                        version_label.grid(row=1, column=0, padx=5, pady=5)
+
+                        view_button = customtkinter.CTkButton(recomm_labels_for_each, text="View", command=lambda app_id=app_id: view_details(app_id))
+                        view_button.grid(row=2, column=0, padx=5, pady=5)
+
+                        separator1 = customtkinter.CTkLabel(recomm_labels_for_each, text="|")
+                        separator1.grid(row=0, column=1, padx=5, pady=5)
+
+                        separator2 = customtkinter.CTkLabel(recomm_labels_for_each, text="|")
+                        separator2.grid(row=1, column=1, padx=5, pady=5)
+
+                        separator3 = customtkinter.CTkLabel(recomm_labels_for_each, text="|")
+                        separator3.grid(row=2, column=1, padx=5, pady=5)
+
+                        column_counter += 1
+                        if column_counter >= max_columns:
+                            column_counter = 1
+                            row_counter += 1
             except Exception as e:
                 print(f"Error processing JSON file {filename}: {e}")
 
