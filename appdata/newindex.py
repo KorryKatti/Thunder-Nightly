@@ -5,11 +5,13 @@
 4. get enough sleep
 """
 
-
+from bs4 import BeautifulSoup
 import markdown
 from tkinterhtml import HtmlFrame
 import multiprocessing
 import webview
+import shutil
+import zipfile
 from tkinter import scrolledtext
 import subprocess
 import threading
@@ -105,6 +107,77 @@ username = data['username']
 print(f"Username: {username}")
 
 
+# Function to download and set up the app
+def download_app(app_id):
+    # Ensure necessary directories exist
+    if not os.path.exists("common/downloading"):
+        os.makedirs("common/downloading")
+    if not os.path.exists("common/apps"):
+        os.makedirs("common/apps")
+
+    # Load app data
+    with open(f"data/{app_id}.json", "r") as f:
+        app_data = json.load(f)
+        repo_url = app_data.get("repo_url")
+        app_name = app_data.get("app_name")
+
+    print(f"Downloading {app_name} from {repo_url}...")
+
+    # Download the repository as a zip file
+    download_url = f"{repo_url}/archive/refs/heads/main.zip"
+    response = requests.get(download_url)
+    response.raise_for_status()
+
+    # Save the zip file
+    zip_path = f"common/downloading/{app_id}.zip"
+    with open(zip_path, "wb") as f:
+        f.write(response.content)
+
+    print(f"Repository downloaded successfully as {app_id}.zip")
+
+    # Extract the zip file
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall("common/downloading")
+
+    # Find the extracted folder
+    extracted_folder = f"common/downloading/{os.path.commonprefix(zip_ref.namelist()).rstrip('/')}"
+    new_folder = f"common/apps/{app_id}"
+
+    # Rename and move the folder
+    if os.path.exists(new_folder):
+        shutil.rmtree(new_folder)
+    shutil.move(extracted_folder, new_folder)
+
+    # Remove the zip file
+    os.remove(zip_path)
+
+    print(f"Repository extracted and moved to {new_folder}")
+
+    # Update downloads.json
+    downloads_file = "userdata/downloads.json"
+    if os.path.exists(downloads_file) and os.path.getsize(downloads_file) > 0:
+        with open(downloads_file, "r") as f:
+            try:
+                downloads = json.load(f)
+            except json.JSONDecodeError:
+                downloads = {}
+    else:
+        downloads = {}
+
+    downloads[app_id] = {
+        "app_name": app_name,
+        "repo_url": repo_url
+    }
+
+    # Debugging statement to check what is being saved
+    print(f"Saving download information: {downloads}")
+
+    with open(downloads_file, "w") as f:
+        json.dump(downloads, f, indent=4)
+
+    # Debugging statement to confirm save
+    print(f"Download information saved for {app_name}.")
+
 def view_details(app_id):
     global scrolledtext  # Ensure scrolledtext is available in this scope
 
@@ -170,6 +243,10 @@ def view_details(app_id):
             # Loading message while fetching README
             loading_label = customtkinter.CTkLabel(readme_frame, text="Loading README...If this fails then probably the author hasn't put a file for it", font=("Roboto", 14), fg_color="transparent")
             loading_label.pack(fill="both", expand=True)
+
+            # download button
+            download_button = customtkinter.CTkButton(main_frame, text="Download", command=lambda: download_app(app_id))
+            download_button.grid(row=7, column=0, padx=5, pady=10, sticky="e")
 
             # comment section
             comment_label = customtkinter.CTkLabel(main_frame,text="Comments",font=("Calibri",16),fg_color="transparent")
@@ -395,6 +472,134 @@ def recommend_labels(recommendations_frame):
                 print(f"Error processing JSON file {filename}: {e}")
 
 
+def view_lib_details(app_id):
+    print(app_id)
+    with open(f"data/{app_id}.json", "r") as f:
+        app_data = json.load(f)
+        app_id = app_data.get("app_id", "Unknown")
+        app_name = app_data.get("app_name", "Unknown")
+        app_description = app_data.get("description", "Unknown")
+        app_version = app_data.get("version", "Unknown")
+        app_repo_url = app_data.get("repo_url", "Unknown")
+        app_main_file = app_data.get("main_file", "Unknown")
+        icon_url = app_data.get("icon_url", f"{no_image_url_prov}")
+ # Apps info on the right side
+    apps_frame = customtkinter.CTkFrame(main_frame)
+    apps_frame.grid(row=0, column=1, padx=5, pady=10, sticky="nsew")
+    apps_frame.grid_columnconfigure(0, weight=1)
+    apps_frame.grid_columnconfigure(1, weight=10)
+    apps_frame.grid_columnconfigure(2, weight=10)
+    apps_frame.grid_columnconfigure(3, weight=10)
+    apps_frame.grid_rowconfigure(0, weight=1)
+    apps_frame.grid_rowconfigure(1, weight=77)
+    apps_frame.grid_rowconfigure(2, weight=99)
+    apps_frame.grid_rowconfigure(3, weight=1)
+
+
+
+    # Display app details
+    app_id_label = customtkinter.CTkLabel(apps_frame, text=f"App ID: {app_id}", font=("Roboto", 14), fg_color="transparent")
+    app_id_label.grid(row=0, column=0, padx=5, pady=10, sticky="nw")
+
+    app_name_label = customtkinter.CTkLabel(apps_frame, text=f"App Name: {app_name}", font=("Roboto", 14), fg_color="transparent")
+    app_name_label.grid(row=0, column=3, padx=5, pady=10, sticky="ne")
+
+           # Display app icon
+    try:
+        response = requests.get(icon_url, stream=True)
+        if response.status_code == 200:
+            image = Image.open(response.raw)
+        else:
+            image = Image.open(no_image_url_prov)
+    except Exception:
+        image = Image.open(no_image_url_prov)
+
+    image = image.resize((100, 100))
+    photo = ImageTk.PhotoImage(image)
+    icon_label = customtkinter.CTkLabel(apps_frame, image=photo, text="")
+    icon_label.image = photo
+    icon_label.grid(row=1, column=0, padx=5, pady=10, sticky="nw")
+
+    # Display app description
+    description_label = customtkinter.CTkLabel(apps_frame, text=f"Description: {app_description}", font=("Roboto", 14), fg_color="transparent")
+    description_label.grid(row=1, column=3, padx=5, pady=10, sticky="ne")
+
+    # Display app version
+    version_label = customtkinter.CTkLabel(apps_frame, text=f"Version: {app_version}", font=("Roboto", 14), fg_color="transparent")
+    version_label.grid(row=1, column=2, padx=5, pady=10, sticky="nw")
+
+    # start app button
+    start_button = customtkinter.CTkButton(apps_frame, text="Start", command=lambda app_id=app_id: start_app(app_id))
+    start_button.grid(row=2, column=2, padx=1, pady=10, sticky="ne")
+
+    # uninstall app button
+    uninstall_button = customtkinter.CTkButton(apps_frame, text="Uninstall", command=lambda app_id=app_id: uninstall_app(app_id))
+    uninstall_button.grid(row=2, column=1, padx=1, pady=10, sticky="ne")
+
+    # open repo button
+    open_repo_button = customtkinter.CTkButton(apps_frame, text="Open Repo", command=lambda app_id=app_id: open_repo(app_id))
+    open_repo_button.grid(row=2, column=0, padx=1, pady=10, sticky="ne")
+
+
+    # textbox with aegis data (coming soon)
+    aegis_label = customtkinter.CTkLabel(apps_frame, text="AEGIS Data", font=("Roboto", 14), fg_color="transparent")
+    aegis_label.grid(row=3, column=0, padx=5, pady=10, sticky="ew")
+    aegis_textbox = customtkinter.CTkTextbox(apps_frame ,width=300, height=200)
+    aegis_textbox.grid(row=4, column=0, padx=5, pady=10, sticky="ew")
+    aegis_textbox.insert("0.0", "Coming soon")
+    aegis_textbox.configure(state="disabled")
+
+def latest_version(app_id):
+    url = f"https://korrykatti.github.io/thapps/apps/{app_id}.html"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        version_tag = soup.find('h2', id='version')
+        if version_tag:
+            latest_ver = version_tag.text.strip()
+            return latest_ver
+        else:
+            print(f"Version tag not found for app_id: {app_id}")
+            return None
+    else:
+        print(f"Failed to fetch URL: {url}, status code: {response.status_code}")
+        return None
+
+
+
+
+def view_up_details(app_id):
+    # make a frame on left displaying the app name and version along with app id
+    with open (f"data/{app_id}.json", "r") as f:
+        app_data = json.load(f)
+        app_id = app_data.get("app_id", "Unknown")
+        app_name = app_data.get("app_name", "Unknown")
+        app_description = app_data.get("description", "Unknown")
+        app_version = app_data.get("version", "Unknown")
+        app_repo_url = app_data.get("repo_url", "Unknown")
+        app_main_file = app_data.get("main_file", "Unknown")
+        icon_url = app_data.get("icon_url", f"{no_image_url_prov}")
+
+    view_updates_frame = customtkinter.CTkFrame(main_frame)
+    view_updates_frame.grid(row=0, column=1, padx=5, pady=10, sticky="e")
+    view_updates_frame.grid_columnconfigure(1, weight=100)
+    view_updates_frame.grid_rowconfigure(1,weight=1)
+    test_label = customtkinter.CTkLabel(view_updates_frame, text=f"App ID: {app_id}", font=("Roboto", 14), fg_color="transparent")
+    test_label.grid(row=0, column=0, padx=5, pady=10, sticky="w")
+    version_label = customtkinter.CTkLabel(view_updates_frame, text=f"Version : {app_version}", font=("Roboto", 14), fg_color="transparent")
+    version_label.grid(row=1, column=0, padx=5, pady=10, sticky="w")
+
+    latest_ver = latest_version(app_id)
+    if latest_ver != app_version:
+        update_label = customtkinter.CTkLabel(view_updates_frame, text=f"Update Available: {latest_version}", font=("Roboto", 14), fg_color="transparent")
+        update_label.grid(row=2, column=0, padx=5, pady=10, sticky="w")
+    else:
+        update_label = customtkinter.CTkLabel(view_updates_frame, text=f"No Update Available", font=("Roboto", 14), fg_color="transparent")
+        update_label.grid(row=2, column=0, padx=5, pady=10, sticky="w")
+
+
+
 
 def libmenu(choice):
     if choice == "Library":
@@ -416,28 +621,35 @@ def libmenu(choice):
         heading_title_label = customtkinter.CTkLabel(library_frame, text="[ Apps and softwares ]", font=("Roboto", 19), fg_color="transparent")
         heading_title_label.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 
-
-        # Apps info on the right side
-        apps_frame = customtkinter.CTkFrame(main_frame)
-        apps_frame.grid(row=0, column=1, padx=5, pady=10, sticky="nsew")
-        apps_frame.grid_rowconfigure(0, weight=1)  # Ensure apps_frame expands vertically
-        apps_frame.grid_columnconfigure(0, weight=1)
-
-
+        # display app name of app id which exist in userdata/downloads.json
+        with open("userdata/downloads.json", "r") as f:
+            data = json.load(f)
+            row_counter = 1
+            for app_id in data:
+                app_name = data[app_id]["app_name"]
+                app_name_button = customtkinter.CTkButton(library_frame, text=app_name, command=lambda app_id=app_id: view_lib_details(app_id))
+                app_name_button.grid(row=row_counter, column=0, padx=5, pady=10, sticky="nsew")
+                row_counter += 1
 
     elif choice == "App Update":
         print("App Update")
         # Clear main frame
         for widget in main_frame.winfo_children():
             widget.destroy()
-        # Load app update frame
-        app_update_frame = customtkinter.CTkScrollableFrame(main_frame,height=600)
-        app_update_frame.grid(row=1, column=0, padx=5, pady=10, sticky="nsew")
-        app_update_frame.grid_rowconfigure(0, weight=1)
-        app_update_frame.grid_columnconfigure(0, weight=1)
-        app_update_label = customtkinter.CTkLabel(app_update_frame, text="App Update. Check the apps which needs updates here", font=("Roboto", 19), fg_color="transparent")
-        app_update_label.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 
+        # add a list of downloaded apps at left in a new frame
+        app_update_frame = customtkinter.CTkScrollableFrame(main_frame,width=300)
+        app_update_frame.grid(row=0, column=0, padx=5, pady=10, sticky="w")
+        app_update_frame.grid_rowconfigure(0, weight=99)  # Ensure library_frame expands vertically
+        # display app name of app id which exist in userdata/downloads.json as a button
+        with open("userdata/downloads.json", "r") as f:
+            data = json.load(f)
+            row_counter = 1
+            for app_id in data:
+                app_name = data[app_id]["app_name"]
+                app_name_button = customtkinter.CTkButton(app_update_frame, text=app_name, command=lambda app_id=app_id: view_up_details(app_id))
+                app_name_button.grid(row=row_counter, column=0, padx=5, pady=10, sticky="nsew")
+                row_counter += 1
 
 
 def commmenu(choice):
