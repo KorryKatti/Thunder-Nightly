@@ -4,7 +4,7 @@ import os
 import uuid
 import time
 import requests
-
+# what the hell am i doing
 from CTkMessagebox import CTkMessagebox
 from funx.fetch_data import fetch_server_stats, ping_server
 
