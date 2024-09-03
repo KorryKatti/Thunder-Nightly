@@ -1,0 +1,44 @@
+/*
+background : dark shade of violet then gradient transition into dark magenta
+text color : white with little lime green
+font : https://fonts.google.com/specimen/Montserrat
+*/
+/* 
+TODO : stars
+
+*/
+/* Background Color */
+body {
+    background-color: #003566; /* Deep Navy Blue */
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+}
+
+/* Text Styling */
+h1, p {
+    color: white; /* Plain white text without lime green glow */
+}
+
+/* Button Styling */
+button {
+    background-color: #00FFFF; /* Bright Cyan */
+    color: #003566; /* Navy Blue for text contrast */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Button Hover Effect */
+button:hover {
+    background-color: #32CD32; /* Bright Lime Green on hover */
+    color: white; /* White text when hovered */
+}
+
+/* Button Focus Effect */
+button:focus {
+    outline: none;
+    box-shadow: 0 0 10px #00FFFF; /* Cyan glow on focus */
+}
