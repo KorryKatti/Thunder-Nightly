@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <h1 style="text-align: center; margin-top: 120px;">Thunder</h1>
+    
+    <h4 style="text-align: center; margin-top: 20px;">Now Loading.... Please Wait.....</h4>
+
+    <!-- Progress Bar outside of <h4> for proper block-level structure -->
+    <h4 style="text-align: center; margin-top: 20px;">TODO : Add a loader here</h4>
+
+    <!--11 seconds lame animation i know-->
+    <h4 style="text-align: center; margin-top: 250px;">Did you know</h4>
+    
+    <!-- Quote container -->
+    <div id="quote" style="text-align: center; margin-top: 20px;">Loading...</div>
+
+    <!-- External Scripts -->
+    <script src="{{ url_for('static', filename='prog.js') }}"></script>
+    <script src="{{ url_for('static', filename='fac.js') }}"></script>
+
+</body>
+
+</html>
