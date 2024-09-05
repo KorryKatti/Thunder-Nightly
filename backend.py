@@ -1,5 +1,19 @@
 from flask import Flask, render_template
+import os
 app = Flask(__name__)
+
+################################################################
+################# USER DATA HANDLING HERE #######################
+
+#check if local folder exist and create if not
+if not os.path.exists('local'):
+    os.makedirs('local')
+
+
+
+
+####################################################################
+###################################################################
 
 @app.route('/')
 def index():

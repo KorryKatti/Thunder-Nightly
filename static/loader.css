@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Remove height: 100vh to prevent centering vertically across the whole screen */
+  margin-top: 20px; /* Adjust this value as needed */
+}
+
+.bar {
+  width: 200px;
+  height: 20px;
+  background-color: #ccc;
+  position: relative;
+}
+
+.bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background-color: #00f;
+  animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+  to {
+    width: 100%;
+  }
+}
