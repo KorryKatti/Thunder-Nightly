@@ -1,10 +1,14 @@
 
 const quotes = [
-    "The only limit to our realization of tomorrow is our doubts of today.",
-    "Do not watch the clock. Do what it does. Keep going.",
-    "The future belongs to those who believe in the beauty of their dreams.",
-    "It does not matter how slowly you go as long as you do not stop.",
-    "Success is not final, failure is not fatal: It is the courage to continue that counts."
+    "This project is open source at github.com/korrykatti/Thunder",
+    "You can contribute to Thunder at the nightly repository",
+    " Initially the gui was fully designed in python using tkinter",
+    "If you have any suggestions or questions, please let us know at github.com/korrykatti/Thunder",
+    "Thank you for using Thunder",
+    "If you liked the project, please consider giving it a star on github.com/korrykatti/Thunder",
+    "If you have any feedback, please let us know at github.com/korrykatti/Thunder",
+    "Thunder's website is at thunderenv.glitch.me",
+    "We have our own imageboard at korrykatti.pythonanywhere.com"
 ];
 
 function displayRandomQuote() {
@@ -15,4 +19,3 @@ function displayRandomQuote() {
 
 // Display a random quote when the page loads
 window.onload = displayRandomQuote;
-
