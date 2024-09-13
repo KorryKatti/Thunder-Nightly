@@ -1,5 +1,5 @@
-from flask import Flask, render_template
-import requests
+from flask import Flask, render_template,request,jsonify
+import requests 
 import json
 import os
 app = Flask(__name__)
@@ -18,11 +18,22 @@ if not os.path.exists('local/settings.json'):
         f.close()
 
 
+
+
 with open('local/settings.json') as f:
     settings = json.load(f)
     server = settings['server']
     f.close()
 
+# Helper function to load data from JSON
+def load_data():
+    with open('serverdata/data.json', 'r') as f:
+        return json.load(f)
+
+# Helper function to save data to JSON
+def save_data(data):
+    with open('serverdata/data.json', 'w') as f:
+        json.dump(data, f, indent=4)
 
 response = requests.get(server+'/ping')
 
@@ -47,7 +58,12 @@ print("                                     ")
 def index():
     return render_template('index.html')
 
-@app.route('/login')
+
+
+# login and signup from same function , sends data to server/login , namely username and password. and then returns the code from server
+
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     return render_template('login.html')
 
