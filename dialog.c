@@ -1,56 +1,65 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-void main() {
-    char username[30];
-    char password[50];
-    char email[320];
-    char pfp_url[2083];
-    char description[500];
+#define FILENAME "localdata/userdata.json"
+#define USERNAME_MAX_LENGTH 30
+#define EMAIL_MAX_LENGTH 320
+#define PFP_URL_MAX_LENGTH 2083
+#define DESCRIPTION_MAX_LENGTH 500
 
-  
-    const char *filename = "localdata/userdata.json";  
+void clearScreen() {
+    printf("\033[2J\033[H");  // Clear the terminal screen
+    fflush(stdout);
+}
 
-   
-    FILE *file = fopen(filename, "r");  
+void getInput(char *prompt, char *buffer, int maxLength) {
+    printf("%s", prompt);
+    printf("> ");
+    fflush(stdout);
+    fgets(buffer, maxLength, stdin);
+    buffer[strcspn(buffer, "\n")] = 0; // Remove the trailing newline character
+}
+
+void saveToFile(const char *username, const char *email, const char *pfp_url) {
+    FILE *file = fopen(FILENAME, "w");
     if (file) {
-        printf("Yes, '%s' exists in the 'localdata' folder.\n", filename);
-        fclose(file);  
+        fprintf(file, "{\n");
+        fprintf(file, "    \"username\": \"%s\",\n", username);
+        fprintf(file, "    \"email\": \"%s\",\n", email);
+        fprintf(file, "    \"profile_picture\": \"%s\"\n", pfp_url);
+        fprintf(file, "}\n");
+        fclose(file);
     } else {
-        printf("No, '%s' does not exist in the 'localdata' folder.\n", filename);
+        printf("Could not open file for writing.\n");
     }
+}
 
-    printf("Please enter your username: \n");
-    scanf("%s", username);  
-
-    printf("Please enter your password: \n");
-    scanf("%s", password);  
-
-   
-    int valid_email;
-    do {
-        printf("Please enter your email: \n");
-        scanf("%s", email);
-
-        // Check for '@' using strchr
-        valid_email = (strchr(email, '@') != NULL);  
-
-        if (!valid_email) {
-            printf("Invalid Email! Please re-enter.\n");
-        }
-    } while (!valid_email); 
-
-    printf("Please enter your profile picture URL: \n");
-    scanf("%s", pfp_url);  
-
-    getchar(); 
-
-    printf("Please enter your description (can include spaces): \n");
-    scanf(" %[^\n]", description);  
+int main() {
+    char username[USERNAME_MAX_LENGTH + 1] = "";
+    char email[EMAIL_MAX_LENGTH + 1] = "";
+    char pfp_url[PFP_URL_MAX_LENGTH + 1] = "";
     
-    printf("\nUsername: %s\n", username);
-    printf("Password: %s\n", password);
+    // Get username
+    clearScreen();
+    getInput("Enter Username (3-30 characters): ", username, sizeof(username));
+    saveToFile(username, email, pfp_url);  // Save after entering username
+
+    // Get email
+    clearScreen();
+    getInput("Enter Email: ", email, sizeof(email));
+    saveToFile(username, email, pfp_url);  // Save after entering email
+
+    // Get profile picture URL
+    clearScreen();
+    getInput("Enter Profile Picture URL (or press Enter to skip): ", pfp_url, sizeof(pfp_url));
+    saveToFile(username, email, pfp_url);  // Save after entering URL
+
+    // Show saved data
+    clearScreen();
+    printf("Saved Information:\n");
+    printf("Username: %s\n", username);
     printf("Email: %s\n", email);
     printf("Profile Picture URL: %s\n", pfp_url);
-    printf("Description: %s\n", description);
+    return 0;
 }
