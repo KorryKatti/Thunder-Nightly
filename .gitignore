@@ -2,3 +2,5 @@
 .venv/
 local/settings.json
 god help me . txt
+*.exe
+.vscode/
