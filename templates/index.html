@@ -4,12 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading Thunder</title>
-    <!--<meta http-equiv="refresh" content="5; url =#" />-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index_vid.css') }}">
+    <meta http-equiv="refresh" content="3; URL='/homepage'" />
+    <script type="text/javascript">
+        const username = "{{ username }}";
+        const email = "{{ email }}";
+        const pfp = "{{ pfp }}";
+    </script>
+
+    <script src="{{ url_for('static', filename='js/dat_stor.js') }}"></script>
 </head>
 <body>
-    <!-- loading i guess-->
     <h1>Hello, {{ username }}!</h1>
-    <p>You are {{ email }} years old.</p>
+    <!--<p>Your email is {{ email }}.</p>-->
+    <h2><img src="{{ pfp }}" alt="Profile Picture"></h2>
     
+    <video autoplay muted loop id="myVideo">
+        <source src="{{ url_for('static', filename='videos/test.mp4') }}" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <script src="{{ url_for('static', filename='js/home_vid.js') }}"></script>
 </body>
 </html>
