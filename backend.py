@@ -31,6 +31,10 @@ def index():
         return render_template("index.html", **data_hell_yeah)
     else:
         return "File does not exist."
+    
+@app.route("/homepage")
+def homepage():
+    return render_template("hempej.html",**data_hell_yeah)
 
 if __name__ == "__main__":
     app.run(debug=True, port=6969)
