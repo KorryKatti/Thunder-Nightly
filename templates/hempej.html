@@ -8,6 +8,47 @@
     <script src="{{ url_for('static', filename='js/homepage.js') }}" defer></script>
 </head>
 <body>
-    <h2>Hello <span id="username-placeholder"></span></h2>
+    <div class="container">
+        <div class="dropdown-container">
+            <select id="dropdown1" onchange="loadIframe(this.value)">
+                <option value="" selected disabled hidden>store</option>
+                <option value="all_apps">all apps</option>
+                <option value="check_updates">check for updates</option>
+                <option value="quit">quit</option>
+            </select>
+            <select id="dropdown2">
+                <option value="" selected disabled hidden>library</option>
+                <option value="option1">library</option>
+                <option value="option2">app updates</option>
+                <option value="option3">favourites</option>
+            </select>
+            <select id="dropdown3" onchange="loadIframe(this.value)">
+                <option value="" selected disabled hidden>community</option>
+                <option value="https://korrykatti.pythonanywhere.com">image board</option>
+                <option value="https://github.com">github</option>
+                <option value="coming_soon">coming soon</option>
+            </select>
+            <select id="dropdown4">
+                <option value="" selected disabled hidden>dev-updates</option>
+                <option value="option1">dev blogs</option>
+                <option value="option2">documentation</option>
+                <option value="option3">nightly build</option>
+            </select>
+        </div>
+        <div class="title">Thunder App Store</div>
+        <div class="right-dropdown">
+            <!-- Another dropdown to the right side of the page -->
+            <select id="dropdown5">
+                <option value="" selected disabled hidden>profile</option>
+                <option value="option1">profile</option>
+                <option value="option2">settings</option>
+                <option value="option3">log out</option>
+            </select>
+        </div>
+    </div>
+
+        <div class="iframe-container">
+        <iframe id="content-frame" src="" frameborder="0"></iframe>
+    </div>
 </body>
 </html>

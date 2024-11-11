@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import os
 import json
+import webbrowser
 
 app = Flask(__name__)
 USER_DATA_LOADED = False
@@ -25,10 +26,13 @@ data_hell_yeah = {
     'pfp': profile_picture
 }
 
+
+
 @app.route("/")
 def index():
     if USER_DATA_LOADED:
         return render_template("index.html", **data_hell_yeah)
+        
     else:
         return "File does not exist."
     
@@ -37,4 +41,5 @@ def homepage():
     return render_template("hempej.html",**data_hell_yeah)
 
 if __name__ == "__main__":
+    webbrowser.open("http://127.0.0.1:6969")
     app.run(debug=True, port=6969)

@@ -1,5 +1,50 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     background-color: #130330;
     color: #F7879A;
+    margin: 0; /* Remove default margin to avoid horizontal overflow */
+}
+
+.container {
+    width: 100%;
+    max-width: 100vw;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-container, .right-dropdown {
+    display: flex;
+    gap: 10px;
+}
+.title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Container takes up full page height minus any headers or margins */
+.iframe-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: calc(100vh - 60px);  /* Adjust the offset (60px here) based on the header or other elements above */
+    margin-top: 20px;
+}
+
+#content-frame {
+    width: 90%;           /* Width fills most of the container */
+    height: 100%;         /* Height fills entire container */
+    border: 1px solid #ccc;
+    border-radius: 8px;
 }
