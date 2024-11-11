@@ -1,0 +1,81 @@
+body {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    background-color: #130330;
+    color: aqua;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Container for horizontal scrolling */
+.scroll-container {
+    overflow-x: auto; /* Enables horizontal scrolling */
+    white-space: nowrap; /* Keeps images in a row */
+    max-width: 90vw; /* Limit the container width */
+    margin: 0 auto; /* Center the container */
+    padding: 20px;
+    background-color: #2d2d44;
+    border: 1px solid #555;
+    border-radius: 8px;
+}
+
+/* Styling for individual images */
+.scroll-container img {
+    display: inline-block;
+    height: 200px;
+    margin-right: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+/* Hover effect */
+.scroll-container img:hover {
+    transform: scale(1.05);
+}
+
+/* Tooltip container */
+.tooltip {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+    color: #00bcd4;
+    margin-left: 5px;
+}
+
+/* Tooltip text */
+.tooltip-text {
+    visibility: hidden;
+    width: 250px; /* Adjust as needed */
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    padding: 8px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the icon */
+    left: 50%;
+    margin-left: -125px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+/* Tooltip arrow */
+.tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* Arrow below the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+/* Show tooltip on hover */
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}

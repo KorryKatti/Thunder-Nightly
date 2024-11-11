@@ -35,11 +35,11 @@ function toggleMaximizeIframe(action) {
     }
 }
 
-// Function to load iframe content
+// Function to load iframe content based on URL or route
 function loadIframe(url) {
     const iframe = document.getElementById('content-frame');
-    if (url && url.startsWith("http")) {
-        iframe.src = url;
+    if (url) {
+        iframe.src = url; // Set the iframe src to the URL or relative path
     } else {
         iframe.src = ""; // Clear the iframe if no valid URL
     }
@@ -51,10 +51,9 @@ function toggleChatPopup() {
     popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
 }
 
-// Retrieve username from localStorage and update the HTML element if exists
-const username = localStorage.getItem("username");
-if (username) {
-    document.getElementById("username-placeholder").textContent = username;
-} else {
-    document.getElementById("username-placeholder").textContent = "Guest";
+// Retrieve username from localStorage and update the HTML element if it exists
+const usernameElement = document.getElementById("username-placeholder");
+if (usernameElement) {
+    const username = localStorage.getItem("username");
+    usernameElement.textContent = username || "Guest";
 }
