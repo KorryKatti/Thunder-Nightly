@@ -7,3 +7,12 @@ if (username) {
 } else {
     document.getElementById("username-placeholder").textContent = "Guest";
 }
+
+function loadIframe(url) {
+    const iframe = document.getElementById('content-frame');
+    if (url && url.startsWith("http")) {
+        iframe.src = url;
+    } else {
+        iframe.src = ""; // Clear the iframe if no valid URL
+    }
+}
