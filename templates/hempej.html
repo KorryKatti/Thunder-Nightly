@@ -10,25 +10,26 @@
 <body>
     <div class="container">
         <div class="dropdown-container">
-            <select id="dropdown1" onchange="loadIframe(this.value)">
+            <!-- Left Dropdowns with added 'left-dropdown' class -->
+            <select id="dropdown1" class="left-dropdown" onchange="loadIframe(this.value)">
                 <option value="" selected disabled hidden>store</option>
                 <option value="all_apps">all apps</option>
                 <option value="check_updates">check for updates</option>
                 <option value="quit">quit</option>
             </select>
-            <select id="dropdown2">
+            <select id="dropdown2" class="left-dropdown">
                 <option value="" selected disabled hidden>library</option>
                 <option value="option1">library</option>
                 <option value="option2">app updates</option>
                 <option value="option3">favourites</option>
             </select>
-            <select id="dropdown3" onchange="loadIframe(this.value)">
+            <select id="dropdown3" class="left-dropdown" onchange="loadIframe(this.value)">
                 <option value="" selected disabled hidden>community</option>
                 <option value="https://korrykatti.pythonanywhere.com">image board</option>
                 <option value="https://github.com">github</option>
                 <option value="coming_soon">coming soon</option>
             </select>
-            <select id="dropdown4">
+            <select id="dropdown4" class="left-dropdown">
                 <option value="" selected disabled hidden>dev-updates</option>
                 <option value="option1">dev blogs</option>
                 <option value="option2">documentation</option>
@@ -36,19 +37,47 @@
             </select>
         </div>
         <div class="title">Thunder App Store</div>
+        
+        <!-- Right dropdown with Maximize/Minimize options -->
         <div class="right-dropdown">
-            <!-- Another dropdown to the right side of the page -->
-            <select id="dropdown5">
+            <select id="dropdown5" onchange="handleRightDropdownChange(this.value)">
                 <option value="" selected disabled hidden>profile</option>
-                <option value="option1">profile</option>
-                <option value="option2">settings</option>
-                <option value="option3">log out</option>
+                <option value="profile">profile</option>
+                <option value="settings">settings</option>
+                <option value="log_out">log out</option>
+                <option value="chat">Chat</option>
+                <option value="maximize">Maximize</option>
+                <option value="minimize">Minimize</option>
             </select>
         </div>
     </div>
 
-        <div class="iframe-container">
+    <div class="iframe-container">
+        <!-- Left image -->
+        <div class="side-image left-image">
+            <img src="https://picsum.photos/100/600" alt="Left Placeholder Image">
+        </div>
+
+        <!-- Center iframe -->
         <iframe id="content-frame" src="" frameborder="0"></iframe>
+
+        <!-- Right image -->
+        <div class="side-image right-image">
+            <img src="https://picsum.photos/100/600" alt="Right Placeholder Image">
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Thunder App Store - All rights reserved.</p>
+    </footer>
+
+    <!-- Chat Popup Modal -->
+    <div id="chat-popup" class="popup">
+        <div class="popup-content">
+            <span class="close-button" onclick="toggleChatPopup()">×</span>
+            <iframe src="https://thunderenv.glitch.me" frameborder="0" class="popup-iframe"></iframe>
+        </div>
     </div>
 </body>
 </html>
