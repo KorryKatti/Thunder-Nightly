@@ -40,6 +40,10 @@ def index():
 def homepage():
     return render_template("hempej.html",**data_hell_yeah)
 
+@app.route("/store")
+def store():
+    return render_template("store.html",**data_hell_yeah)
+
 if __name__ == "__main__":
     webbrowser.open("http://127.0.0.1:6969")
     app.run(debug=True, port=6969)

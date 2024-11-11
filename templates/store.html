@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thunder App Store</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='store.css') }}">
+</head>
+<body>
+    <center><h3>Welcome back {{ username }}</h3></center>
+    <hr>
+
+    <!-- All Apps Section -->
+    <p align="left">
+        All Apps [ <a href="/allapps">list view</a> ]
+        <span class="tooltip">ⓘ
+            <span class="tooltip-text">List view is the most updated and reliable view to find all apps. Apps on the front page are only featured ones.</span>
+        </span>
+    </p>
+    <div class="scroll-container">
+        <img src="https://picsum.photos/200/300?random=1" alt="Image 1">
+        <img src="https://picsum.photos/200/300?random=2" alt="Image 2">
+        <!-- more images -->
+    </div>
+    <hr>
+
+    <!-- Recommended Apps Section -->
+    <p align="left">
+        Recommended Apps [ <a href="/recomm">list view</a> ]
+        <span class="tooltip">ⓘ
+            <span class="tooltip-text">Handpicked apps tailored for you!</span>
+        </span>
+    </p>
+    <div class="scroll-container">
+        <img src="https://picsum.photos/200/300?random=11" alt="Image 11">
+        <img src="https://picsum.photos/200/300?random=12" alt="Image 12">
+        <!-- more images -->
+    </div>
+    <hr>
+
+    <!-- Random App Roulette Section -->
+    <p align="left">
+        Random App Roulette
+        <span class="tooltip">ⓘ
+            <span class="tooltip-text">Spin the roulette for a surprise app!</span>
+        </span>
+    </p>
+    <button onclick="spinRoulette()">Spin Roulette</button>
+    <div id="roulette-result"></div>
+    <hr>
+
+    <!-- Trending This Week Section -->
+    <p align="left">
+        Trending This Week
+        <span class="tooltip">ⓘ
+            <span class="tooltip-text">Check out what's popular this week!</span>
+        </span>
+    </p>
+    <div class="scroll-container">
+        <img src="https://picsum.photos/200/300?random=21" alt="Image 21">
+        <img src="https://picsum.photos/200/300?random=22" alt="Image 22">
+        <!-- more images -->
+    </div>
+    <hr>
+
+    <!-- App of the Fortnight Section -->
+    <p align="left">
+        App of the Fortnight
+        <span class="tooltip">ⓘ
+            <span class="tooltip-text">Discover our featured app of the fortnight!</span>
+        </span>
+    </p>
+    <div class="fortnight-container">
+        <img src="https://picsum.photos/200/300?random=31" alt="App of the Fortnight">
+        <p><strong>Featured App:</strong> Amazing App</p>
+        <p>Experience something new and exciting with our App of the Fortnight!</p>
+    </div>
+    <hr>
+
+    <!-- Stats and Server Status Section -->
+    <section id="server-stats">
+        <h4>Stats and Server Status</h4>
+        <p><strong>Visitor Count:</strong> <span id="visitor-count">NaN</span></p>
+        <p><strong>Thunder Server Stats:</strong></p>
+        <p>Ping: <span id="thunder-ping">Loading...</span></p>
+        <p>CPU Usage: <span id="thunder-cpu">Loading...</span></p>
+        <p>RAM Usage: <span id="thunder-ram">Loading...</span></p>
+
+        <p><strong>Mirage Server Stats:</strong></p>
+        <p>Ping: <span id="mirage-ping">Loading...</span></p>
+        <p>CPU Usage: <span id="mirage-cpu">Loading...</span></p>
+        <p>RAM Usage: <span id="mirage-ram">Loading...</span></p>
+
+        <p><strong>24H User Count:</strong> <span id="user-count">Loading...</span></p>
+    </section>
+    <hr>
+</body>
+
+<script>
+    function spinRoulette() {
+        const randomAppId = Math.floor(Math.random() * 10) + 1;
+        const resultDiv = document.getElementById("roulette-result");
+        resultDiv.innerHTML = `<p>You got: App #${randomAppId}</p>`;
+    }
+</script>
+</html>
