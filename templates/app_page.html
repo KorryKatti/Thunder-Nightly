@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} - App Information</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='apppage.css') }}">
+</head>
+<body>
+    <!-- Back Button -->
+    <div class="back-button">
+        <a href="/store" class="button">← Back to Store</a>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="app-page">
+        <!-- Header with App Name, Icon, and Download Button -->
+        <header class="app-header">
+            <img src="{{ icon_url }}" alt="{{ app_name }} Icon" class="app-icon">
+            <h1>{{ app_name }}</h1>
+            <a href="#" class="download-button">Download</a>
+        </header>
+
+        <!-- Gallery Section -->
+        <section class="gallery">
+            <img src="https://i.pinimg.com/originals/7f/f9/a2/7ff9a27da311166cc40ccfd331d1c7e5.gif" alt="Screenshot 1">
+            <img src="https://i.pinimg.com/originals/7f/f9/a2/7ff9a27da311166cc40ccfd331d1c7e5.gif" alt="Screenshot 2">
+            <img src="https://i.pinimg.com/originals/7f/f9/a2/7ff9a27da311166cc40ccfd331d1c7e5.gif" alt="Screenshot 3">
+        </section>
+
+        <!-- Details Section -->
+        <section class="details">
+            <p><strong>App ID:</strong> {{ app_id }}</p>
+            <p><strong>Version:</strong> {{ version }}</p>
+            <p><strong>Repository URL:</strong> <a href="{{ repo_url }}" target="_blank">{{ repo_url }}</a></p>
+            <p><strong>Main File:</strong> {{ main_file }}</p>
+            <div class="description">
+                <p><strong>Description:</strong></p>
+                <p>{{ description }}</p>
+            </div>
+        </section>
+
+        <!-- Comment Section -->
+        <section class="comments-section">
+            <h2>User Reviews</h2>
+            <div class="comments">
+                <!-- Demo comments -->
+                <div class="comment">
+                    <p><strong>User1:</strong> Great app! Very useful for my workflow.</p>
+                </div>
+                <div class="comment">
+                    <p><strong>User2:</strong> Needs some improvements, but overall it's solid.</p>
+                </div>
+                <div class="comment">
+                    <p><strong>User3:</strong> Fantastic interface and easy to use!</p>
+                </div>
+            </div>
+            <!-- Add Comment Box -->
+            <div class="add-comment">
+                <textarea placeholder="Write your review here..."></textarea>
+                <button class="submit-button" disabled>Submit Review</button>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 My App Store</p>
+    </footer>
+</body>
+</html>

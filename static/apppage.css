@@ -1,0 +1,114 @@
+/* Existing styles remain the same */
+
+.app-page {
+    max-width: 800px;
+    margin: auto;
+    text-align: left;
+    color: aqua;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid aqua;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.app-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    border: 2px solid aqua;
+}
+
+.download-button {
+    margin-left: auto;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    border: 2px solid #0056b3;
+}
+
+.download-button:hover {
+    background-color: #0056b3;
+}
+
+.gallery {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.gallery img {
+    width: 200px;
+    height: 112px;
+    border-radius: 5px;
+    border: 2px solid aqua;
+}
+
+.details {
+    background-color: #1a0738;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid aqua;
+}
+
+.comments-section {
+    background-color: #1a0738;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    border: 1px solid aqua;
+}
+
+.comments-section h2 {
+    color: aqua;
+    margin-bottom: 10px;
+}
+
+.comments {
+    margin-bottom: 15px;
+}
+
+.comment {
+    background-color: #2b0a47;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.add-comment {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-comment textarea {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid aqua;
+    background-color: #1a0738;
+    color: aqua;
+    resize: none;
+    height: 80px;
+}
+
+.submit-button {
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: not-allowed;
+}
+.submit-button:hover {
+    background-color: #0056b3;
+}
