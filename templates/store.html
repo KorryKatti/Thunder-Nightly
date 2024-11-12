@@ -18,7 +18,7 @@
         </span>
     </p>
     <div class="scroll-container">
-        <img src="https://picsum.photos/200/300?random=1" alt="Image 1">
+        <a href="/app/00001"><img src="https://picsum.photos/200/300?random=1" alt="app 00001"></a>
         <img src="https://picsum.photos/200/300?random=2" alt="Image 2">
         <!-- more images -->
     </div>
@@ -98,7 +98,7 @@
 
 <script>
     function spinRoulette() {
-        const randomAppId = Math.floor(Math.random() * 10) + 1;
+        const randomAppId = Math.floor(Math.random() * 100) + 1;
         const resultDiv = document.getElementById("roulette-result");
         resultDiv.innerHTML = `<p>You got: App #${randomAppId}</p>`;
     }
