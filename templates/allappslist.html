@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thunder App Store</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='store.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='gifpreloader.css') }}">
+</head>
+<body>
+    <div id="preloader">
+        <img src="{{ url_for('static', filename='images/loader.gif') }}" alt="Loading...">
+    </div>
+    
+    <h1>All Apps</h1>
+    <form action="/refresh-cache" method="post">
+        <button type="submit" class="btn btn-primary">Refresh</button>
+    </form>
+    
+    {% for app in apps %}
+        <div class="app-box">
+            <h2>{{ app.app_name }}</h2>
+            <p><strong>ID:</strong> {{ app.app_id }}</p>
+            <p><strong>Version:</strong> {{ app.version }}</p>
+            <p><strong>Description:</strong> {{ app.description }}</p>
+            <p><strong>Repo URL:</strong> <a href="{{ app.repo_url }}" target="_blank">{{ app.repo_url }}</a></p>
+            {% if app.icon_url %}
+                <img src="{{ app.icon_url }}" alt="{{ app.app_name }} Icon" style="width: 50px; height: 50px;">
+            {% endif %}
+            <form action="/downloadapp" method="get">
+                <input type="hidden" name="app_id" value="{{ app.app_id }}">
+                <button type="submit" class="btn btn-primary">Download</button>
+            </form>
+        </div>
+    {% endfor %}
+    <script src="{{ url_for('static', filename='js/preloader.js') }}"></script>
+</body>
+</html>
