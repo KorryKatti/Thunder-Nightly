@@ -38,12 +38,16 @@ function toggleMaximizeIframe(action) {
 // Function to load iframe content based on URL or route
 function loadIframe(url) {
     const iframe = document.getElementById('content-frame');
-    if (url) {
-        iframe.src = url; // Set the iframe src to the URL or relative path
-    } else {
-        iframe.src = ""; // Clear the iframe if no valid URL
-    }
+    iframe.src = url || ""; // Load the iframe or clear it if no URL
+
+    // Reset the dropdown to always show the title (first option)
+    const dropdowns = document.querySelectorAll('select.left-dropdown');
+    dropdowns.forEach(dropdown => {
+        dropdown.selectedIndex = 0; // Reset to the first option
+    });
 }
+
+
 
 // Function to toggle the visibility of the chat popup
 function toggleChatPopup() {
