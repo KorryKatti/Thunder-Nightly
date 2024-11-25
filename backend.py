@@ -77,5 +77,5 @@ def fetch_app_page(app_id):
     
     
 if __name__ == "__main__":
-    webbrowser.open("http://127.0.0.1:6969")
+    #webbrowser.open("http://127.0.0.1:6969")
     app.run(debug=True, port=6969)
