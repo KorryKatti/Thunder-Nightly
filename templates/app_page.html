@@ -18,7 +18,7 @@
         <header class="app-header">
             <img src="{{ icon_url }}" alt="{{ app_name }} Icon" class="app-icon">
             <h1>{{ app_name }}</h1>
-            <a href="#" class="download-button">Download</a>
+            <a href="{{ url_for('download_app') }}?app_id={{ app_id }}" class="download-button">Download</a>
         </header>
 
         <!-- Gallery Section -->

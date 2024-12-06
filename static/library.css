@@ -1,0 +1,8 @@
+body {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    background-color: #130330;
+    color: aqua;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}

@@ -7,3 +7,5 @@ god help me . txt
 localdata/userdata.json
 *.zig
 static/videos/test.mp4
+applications/
+temp/
