@@ -4,6 +4,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from flask_caching import Cache
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 app.config['CACHE_TYPE'] = 'SimpleCache'  # Using simple in-memory cache
@@ -108,15 +109,101 @@ def fetch_app_page(app_id):
         return render_template('app_page.html', **app_data)
     else:
         return "Page not found", 404
+    
+
+if not os.path.exists('applications'):
+    os.makedirs('applications')
+    print("Folder 'applications' created.")
+else:
+    print("Folder 'applications' already exists.")
+
+if not os.path.exists('temp'):
+    os.makedirs('temp')
+    print("Folder 'temp' created.")
+else:
+    print("Folder 'temp' already exists.")
+
+
+
+def downloadapp(app_id):
+    # Scrape the app data to get the repository URL
+    app_data = scrape_app_data(int(app_id))
+    if app_data and app_data.get("repo_url"):
+        repo_url = app_data["repo_url"]
+        print(f"Repository URL for app ID {app_id}: {repo_url}")
+        
+        # GitHub repository branches to check
+        branches_to_check = ["main", "master", "thunder"]
+        
+        # Create a folder named after the app_id under the 'applications' directory
+        temp_folder = f'applications/{app_id}'
+        if not os.path.exists(temp_folder):
+            os.makedirs(temp_folder)
+            print(f"Folder '{temp_folder}' created.")
+        
+        # Check if the index.json file exists
+        index_file_path = 'applications/index.json'
+        if not os.path.exists(index_file_path):
+            # Create the index.json file if it doesn't exist
+            with open(index_file_path, 'w') as index_file:
+                json.dump({"downloaded_apps": []}, index_file)
+                print("Index file created.")
+        
+        # Load the index.json to check existing downloaded apps
+        with open(index_file_path, 'r') as index_file:
+            index_data = json.load(index_file)
+            downloaded_apps = index_data["downloaded_apps"]
+        
+        # Check if the app_id is already in the list
+        if app_id in downloaded_apps:
+            return f"App ID {app_id} has already been downloaded."
+
+        # Check each branch and try to get the .zip file
+        for branch in branches_to_check:
+            # Construct the URL for the branch's ZIP download
+            branch_url = f"{repo_url.rstrip('/')}/archive/refs/heads/{branch}.zip"
+            response = requests.get(branch_url)
+            
+            # If the branch exists (status code 200), download the ZIP
+            if response.status_code == 200:
+                print(f"Branch '{branch}' found. Downloading the ZIP...")
+                # Extract the filename from the URL
+                file_name = f"{branch}.zip"
+                file_path = os.path.join(temp_folder, file_name)
+
+                # Save the ZIP file to the folder
+                with open(file_path, 'wb') as file:
+                    file.write(response.content)
+                print(f"Repository downloaded and saved to {file_path}.")
+                
+                # Update the index.json file with the downloaded app_id
+                downloaded_apps.append(app_id)
+                index_data["downloaded_apps"] = downloaded_apps
+                with open(index_file_path, 'w') as index_file:
+                    json.dump(index_data, index_file)
+                print(f"App ID {app_id} added to index.")
+                
+                return f"Download initiated for app ID: {app_id}. Repository saved to {file_path}."
+        
+        # If no branches were found
+        return f"None of the branches ({', '.join(branches_to_check)}) exist for the repository {repo_url}."
+    
+    else:
+        return f"App ID {app_id} not found or repository URL is missing."
+
 
 @app.route('/downloadapp', methods=['GET'])
 def download_app():
     app_id = request.args.get('app_id')  # Get the app_id from the query parameter
     if app_id:
-        print(f"Download requested for app ID: {app_id}")
-        return f"Download initiated for app ID: {app_id}"  # For now, return a simple response
+        return downloadapp(app_id)  # Call the function and return its response
     else:
-        return "No app ID provided.", 400  # Handle cases where app_id is missing
+        return "App ID is missing", 400  # Handle cases where app_id is missing
+
+
+@app.route('/library', methods=['GET'])
+def library():
+    return render_template("library.html",**data_hell_yeah)
 
 
 if __name__ == "__main__":
