@@ -203,7 +203,16 @@ def download_app():
 
 @app.route('/library', methods=['GET'])
 def library():
-    return render_template("library.html",**data_hell_yeah)
+    # Load JSON data
+    json_file = os.path.join("applications", "index.json")  # Adjust the path if needed
+    with open(json_file, "r") as file:
+        app_data = json.load(file)
+
+    # Extract downloaded app IDs or provide a default empty list
+    downloaded_apps = app_data.get("downloaded_apps", [])
+
+    # Pass data to the template
+    return render_template("library.html", downloaded_apps=downloaded_apps)
 
 
 if __name__ == "__main__":

@@ -17,19 +17,19 @@
                 <option value="check_updates">check for updates</option>
                 <option value="quit">quit</option>
             </select>
-            <select id="dropdown2" class="left-dropdown">
+            <select id="dropdown2" class="left-dropdown" onchange="loadIframe(this.value)">
                 <option value="" selected disabled hidden>library</option>
-                <option value="option1">library</option>
+                <option value="/library">library</option>
                 <option value="option2">app updates</option>
                 <option value="option3">favourites</option>
-            </select>
+            </select>            
             <select id="dropdown3" class="left-dropdown" onchange="loadIframe(this.value)">
                 <option value="" selected disabled hidden>community</option>
                 <option value="https://korrykatti.pythonanywhere.com">image board</option>
                 <option value="https://github.com">github</option>
                 <option value="coming_soon">coming soon</option>
             </select>
-            <select id="dropdown4" class="left-dropdown">
+            <select id="dropdown4" class="left-dropdown" onchange="loadIframe(this.value)">
                 <option value="" selected disabled hidden>dev-updates</option>
                 <option value="option1">dev blogs</option>
                 <option value="option2">documentation</option>
