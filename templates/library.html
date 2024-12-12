@@ -1,12 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Library</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='library.css') }}">
 </head>
+
 <body>
-    
+    <div class="container">
+        <!-- Left Section -->
+        <div class="left-section">
+            <h2>Installed Apps</h2>
+            {% if downloaded_apps and downloaded_apps|length > 0 %}
+            <div id="app-list">
+                {% for app_id in downloaded_apps %}
+                <button class="app-button" onclick="loadAppDetails(this, '{{ app_id }}')">App ID: {{ app_id }}</button>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No apps are installed.</p>
+            {% endif %}
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section" id="app-details">
+            <h2>App Details</h2>
+            <div id="current-app">
+                <p><strong>Currently Viewing:</strong> No app selected</p>
+            </div>
+            <div id="app-info">
+                <p><strong>Last run epoch:</strong> nothing for now</p>
+                <p><strong>Times opened:</strong> nothing for now</p>
+                <p><strong>Installed version:</strong> nothing for now</p>
+                <p><strong>Latest version:</strong> nothing for now</p>
+            </div>
+            <div id="app-actions">
+                <button class="action-button">Run</button>
+                <button class="action-button">Uninstall</button>
+                <button class="action-button">Explore Files</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadAppDetails(button, appId) {
+            // Highlight the selected app in the left column
+            const appButtons = document.querySelectorAll('.app-button');
+            appButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Update the currently viewing text in the right section
+            const currentApp = document.getElementById('current-app');
+            currentApp.innerHTML = `<p><strong>Currently Viewing:</strong> App ID: ${appId}</p>`;
+
+            // Populate the rest of the right section with app details
+            const appInfo = document.getElementById('app-info');
+            appInfo.innerHTML = `
+                <p><strong>Last run epoch:</strong> nothing for now</p>
+                <p><strong>Times opened:</strong> nothing for now</p>
+                <p><strong>Installed version:</strong> nothing for now</p>
+                <p><strong>Latest version:</strong> nothing for now</p>
+            `;
+        }
+    </script>
 </body>
+
 </html>

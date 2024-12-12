@@ -6,3 +6,90 @@ body {
     padding: 20px;
     text-align: center;
 }
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.left-section {
+    width: 20%;
+    background-color: #1a1a1a; /* Darker background for dark theme */
+    color: #dcdcdc; /* Light gray text for contrast */
+    padding: 20px;
+    overflow-y: auto;
+    border-right: 2px solid #333; /* Subtle border for separation */
+}
+
+.left-section button {
+    background-color: #333; /* Button background */
+    color: #dcdcdc; /* Button text color */
+    border: 1px solid #555; /* Button border */
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%; /* Full width for uniformity */
+    text-align: left; /* Align text to the left */
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.left-section button:hover {
+    background-color: #444; /* Slightly brighter on hover */
+    border-color: #666; /* Highlight border on hover */
+}
+
+.right-section {
+    width: 80%;
+    background-color: #c40e0e; /* Striking red */
+    color: black;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: inset 0 0 10px #8b0000; /* Subtle shadow for depth */
+}
+
+.right-section #app-info p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.right-section #app-actions {
+    margin-top: 20px;
+}
+
+.action-button {
+    background-color: #333; /* Dark button background */
+    color: #dcdcdc; /* Light text for buttons */
+    border: 1px solid #555;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.action-button:hover {
+    background-color: #444; /* Highlight on hover */
+    border-color: #666; /* Brighter border */
+}
+/* Highlight selected app button */
+.app-button {
+    background-color: #333; /* Default button color */
+    color: white;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.app-button:hover {
+    background-color: #444; /* Hover color */
+}
+
+.app-button.active {
+    background-color: #c40e0e; /* Highlight color */
+    color: white;
+}
