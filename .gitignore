@@ -9,3 +9,4 @@ localdata/userdata.json
 static/videos/test.mp4
 applications/
 temp/
+*.out

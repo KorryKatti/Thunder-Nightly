@@ -37,7 +37,7 @@
                 <p><strong>Latest version:</strong> nothing for now</p>
             </div>
             <div id="app-actions">
-                <button class="action-button">Run</button>
+                <button class="action-button" id="run-button">Run</button>
                 <button class="action-button">Uninstall</button>
                 <button class="action-button">Explore Files</button>
             </div>
@@ -63,6 +63,10 @@
                 <p><strong>Installed version:</strong> nothing for now</p>
                 <p><strong>Latest version:</strong> nothing for now</p>
             `;
+
+            // Update the "Run" button to point to the correct app URL
+            const runButton = document.getElementById('run-button');
+            runButton.onclick = () => window.location.href = `/run/${appId}`;
         }
     </script>
 </body>

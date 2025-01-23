@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from flask_caching import Cache
 from urllib.parse import urlparse
+import threading
 
 app = Flask(__name__)
 app.config['CACHE_TYPE'] = 'SimpleCache'  # Using simple in-memory cache
@@ -123,6 +124,78 @@ if not os.path.exists('temp'):
 else:
     print("Folder 'temp' already exists.")
 
+import shutil
+
+
+def allcheckpass_run(app_data):
+    pass
+
+def run_app_thread(app_id):
+    app_data = scrape_app_data(int(app_id))
+    if app_data:
+        app_name = app_data["app_name"]
+        repo_url = app_data["repo_url"]
+        main_file = app_data["main_file"]
+        print(f"Running app: {app_name} from repository: {repo_url}")
+
+    app_dir = f'applications/{app_id}'
+
+    # Check for existing folders inside `applications/<app_id>`
+    if os.path.exists(app_dir):
+        subdirs = [d for d in os.listdir(app_dir) if os.path.isdir(os.path.join(app_dir, d))]
+        if subdirs:
+            old_folder_path = os.path.join(app_dir, subdirs[0])
+            if old_folder_path != app_dir:
+                # Merge contents of old folder into target folder
+                for item in os.listdir(old_folder_path):
+                    src_path = os.path.join(old_folder_path, item)
+                    dest_path = os.path.join(app_dir, item)
+                    if os.path.exists(dest_path):
+                        print(f"Skipping existing item: {dest_path}")
+                    else:
+                        shutil.move(src_path, dest_path)
+
+                # Delete the old folder after merging
+                os.rmdir(old_folder_path)
+                print(f"Renamed and merged folder {old_folder_path} into {app_dir}")
+        else:
+            print(f"No folders found inside {app_dir}")
+    else:
+        os.makedirs(app_dir)
+        print(f"Created directory: {app_dir}")
+
+    print(f"App {app_id} setup completed.")
+    return "success"
+
+    allcheckpass_run(app_data)
+
+
+
+
+import zipfile
+
+@app.route('/run/<app_id>')
+def run_app(app_id):
+    zip_path = f'applications/{app_id}/master.zip'
+    app_dir = f'applications/{app_id}'
+
+    # Handle zip extraction if the zip file exists
+    if os.path.exists(zip_path):
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(app_dir)
+        os.remove(zip_path)
+        print(f"Extraction successful for {zip_path}.")
+    else:
+        print(f"Zip file not found at {zip_path}.")
+
+    print("Initial setup check passed.")
+
+    # Run the app in a separate thread
+    thread = threading.Thread(target=run_app_thread, args=(app_id,))
+    thread.start()
+
+    return f"App {app_id} is being processed. Check logs for progress."
+
 
 
 def downloadapp(app_id):
@@ -214,6 +287,11 @@ def library():
     # Pass data to the template
     return render_template("library.html", downloaded_apps=downloaded_apps)
 
+
+@app.errorhandler(404)
+def not_found(error):
+    # Render the custom 404 template
+    return render_template('404.html'), 404
 
 if __name__ == "__main__":
     app.run(debug=True, port=6969)

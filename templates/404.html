@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost in Anime (404)</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #1e1e2e, #15151f);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            color: #ff6f61;
+            text-shadow: 2px 2px 4px #000;
+        }
+        p {
+            font-size: 1.5rem;
+            margin: 10px 0 20px;
+            color: #f4f4f4;
+        }
+        a {
+            text-decoration: none;
+            color: #ff6f61;
+            font-weight: bold;
+            font-size: 1.3rem;
+            border: 2px solid #ff6f61;
+            padding: 10px 25px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        a:hover {
+            background-color: #ff6f61;
+            color: #1e1e2e;
+        }
+        .anime-img {
+            width: 300px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .dialogue {
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <h1>404</h1>
+    <img src="https://i.pinimg.com/736x/47/e0/d6/47e0d6066546a44560d96347b58bed3c.jpg" alt="Anime Character" class="anime-img">
+    <div class="dialogue">
+        <p>"Oh no! You’ve wandered into a forbidden realm..."</p>
+        <p>"But don’t worry, I’ll guide you back home!"</p>
+    </div>
+    <p>Click below to return to the safety of the store:</p>
+    <a href="/store">Take Me Home</a>
+</body>
+</html>
