@@ -11,6 +11,10 @@ app = Flask(__name__)
 app.config['CACHE_TYPE'] = 'SimpleCache'  # Using simple in-memory cache
 app.config['CACHE_DEFAULT_TIMEOUT'] = 600  # Cache timeout of 10 minutes
 cache = Cache(app)
+index_file = "applications/index.json"
+if not os.path.exists(index_file):
+    with open(index_file, 'w') as f:
+        json.dump({"downloaded_apps": []}, f)
 
 USER_DATA_LOADED = False
 user_data_file_path = "localdata/userdata.json"
