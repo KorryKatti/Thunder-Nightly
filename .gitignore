@@ -9,4 +9,6 @@ localdata/userdata.json
 static/videos/test.mp4
 applications/
 temp/
+# Wails build artifacts
+wails/**/build/
 *.out
