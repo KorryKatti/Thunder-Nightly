@@ -1,4 +1,0 @@
-flask
-requests
-bs4
-Flask-Caching
