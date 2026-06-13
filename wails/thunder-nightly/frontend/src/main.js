@@ -11,6 +11,7 @@ import { renderAppDetail } from './views/appdetail.js';
 import { renderLibrary } from './views/library.js';
 import { renderSettings } from './views/settings.js';
 import { renderHelp } from './views/help.js';
+import { renderCommunity } from './views/community.js';
 
 function renderApp() {
     const app = document.getElementById('app');
@@ -51,6 +52,11 @@ function renderApp() {
     addRoute('/settings', (params) => {
         setState('currentView', 'settings');
         renderSettings(mainContent);
+    });
+
+    addRoute('/community', (params) => {
+        setState('currentView', 'community');
+        renderCommunity(mainContent);
     });
 
     addRoute('/help', (params) => {

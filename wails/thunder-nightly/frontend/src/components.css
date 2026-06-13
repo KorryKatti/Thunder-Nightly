@@ -1654,6 +1654,15 @@
     margin-bottom: 12px;
 }
 
+/* ===== COMMUNITY PAGE ===== */
+.community-frame {
+    width: 100%;
+    height: calc(100vh - 160px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #fff;
+}
+
 .help-inspo {
     margin-top: 16px;
     text-align: center;
