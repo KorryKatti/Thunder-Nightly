@@ -1,43 +1,57 @@
 import './style.css';
 import './app.css';
+import './components.css';
 
-import logo from './assets/images/logo-universal.png';
-import {Greet} from '../wailsjs/go/main/App';
+import { addRoute, initRouter } from './router.js';
+import { setState } from './state.js';
+import { renderSidebar } from './components/sidebar.js';
+import { renderStatusBar } from './components/statusbar.js';
+import { renderHome } from './views/home.js';
+import { renderAppDetail } from './views/appdetail.js';
+import { renderSettings } from './views/settings.js';
 
-document.querySelector('#app').innerHTML = `
-    <img id="logo" class="logo">
-      <div class="result" id="result">Please enter your name below 👇</div>
-      <div class="input-box" id="input">
-        <input class="input" id="name" type="text" autocomplete="off" />
-        <button class="btn" onclick="greet()">Greet</button>
-      </div>
-    </div>
-`;
-document.getElementById('logo').src = logo;
+function renderApp() {
+    const app = document.getElementById('app');
+    app.innerHTML = '';
 
-let nameElement = document.getElementById("name");
-nameElement.focus();
-let resultElement = document.getElementById("result");
+    const body = document.createElement('div');
+    body.className = 'app-body';
 
-// Setup the greet function
-window.greet = function () {
-    // Get name
-    let name = nameElement.value;
+    const sidebarContainer = document.createElement('div');
+    sidebarContainer.className = 'sidebar-container';
 
-    // Check if the input is empty
-    if (name === "") return;
+    const mainContent = document.createElement('div');
+    mainContent.className = 'main-content';
+    mainContent.id = 'main-content';
 
-    // Call App.Greet(name)
-    try {
-        Greet(name)
-            .then((result) => {
-                // Update result with data back from App.Greet()
-                resultElement.innerText = result;
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    } catch (err) {
-        console.error(err);
-    }
-};
+    body.appendChild(sidebarContainer);
+    body.appendChild(mainContent);
+    app.appendChild(body);
+
+    renderSidebar(sidebarContainer);
+    renderStatusBar(app);
+
+    addRoute('/', (params) => {
+        setState('currentView', 'home');
+        renderHome(mainContent);
+    });
+
+    addRoute('/app/:url', (params) => {
+        setState('currentView', 'app');
+        renderAppDetail(mainContent, params.url);
+    });
+
+    addRoute('/settings', (params) => {
+        setState('currentView', 'settings');
+        renderSettings(mainContent);
+    });
+
+    initRouter();
+    updateStatusBar();
+}
+
+async function updateStatusBar() {
+    // Will be populated with real data
+}
+
+document.addEventListener('DOMContentLoaded', renderApp);
