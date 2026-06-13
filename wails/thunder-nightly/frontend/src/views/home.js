@@ -9,51 +9,24 @@ export function renderHome(container) {
 
     const wrapper = el('div', { className: 'home-wrapper' });
 
-    // Hero section
     const hero = el('div', { className: 'home-hero' }, [
         el('div', { className: 'home-hero-icon', html: '⚡' }),
         el('h1', { className: 'home-hero-title', text: 'Thunder' }),
         el('p', { className: 'home-hero-subtitle', text: 'Run any Python app from GitHub instantly' })
     ]);
 
-    // URL input section
     const urlSection = el('div', { className: 'home-url-section' });
     renderURLBar(urlSection, {
         onSubmit: (url) => navigate(`/app/${encodeURIComponent(url)}`)
     });
 
-    // UV status section
     const uvSection = el('div', { className: 'home-uv-section', id: 'uv-status' });
     renderUVStatus(uvSection);
-
-    // Recent URLs (placeholder for future)
-    const recentSection = el('div', { className: 'home-recent' }, [
-        el('h3', { className: 'home-recent-title', text: 'Quick Links' }),
-        el('div', { className: 'home-recent-grid' }, [
-            createQuickLink('https://github.com/pypa/hatch', 'Hatch', 'Modern Python project management'),
-            createQuickLink('https://github.com/astral-sh/uv', 'uv', 'Fast Python package installer'),
-            createQuickLink('https://github.com/jlowin/fastmcp', 'FastMCP', 'Build MCP servers in Python')
-        ])
-    ]);
 
     wrapper.appendChild(hero);
     wrapper.appendChild(urlSection);
     wrapper.appendChild(uvSection);
-    wrapper.appendChild(recentSection);
     container.appendChild(wrapper);
-}
-
-function createQuickLink(url, name, description) {
-    return el('div', {
-        className: 'home-quicklink',
-        onClick: () => navigate(`/app/${encodeURIComponent(url)}`)
-    }, [
-        el('div', { className: 'home-quicklink-icon', text: name.charAt(0).toUpperCase() }),
-        el('div', { className: 'home-quicklink-info' }, [
-            el('span', { className: 'home-quicklink-name', text: name }),
-            el('span', { className: 'home-quicklink-desc', text: description })
-        ])
-    ]);
 }
 
 async function renderUVStatus(container) {

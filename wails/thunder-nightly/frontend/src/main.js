@@ -2,13 +2,15 @@ import './style.css';
 import './app.css';
 import './components.css';
 
-import { addRoute, initRouter } from './router.js';
+import { addRoute, initRouter, navigate } from './router.js';
 import { setState } from './state.js';
 import { renderSidebar } from './components/sidebar.js';
-import { renderStatusBar } from './components/statusbar.js';
+import { renderStatusBar, refreshStatusBar } from './components/statusbar.js';
 import { renderHome } from './views/home.js';
 import { renderAppDetail } from './views/appdetail.js';
+import { renderLibrary } from './views/library.js';
 import { renderSettings } from './views/settings.js';
+import { renderHelp } from './views/help.js';
 
 function renderApp() {
     const app = document.getElementById('app');
@@ -41,17 +43,22 @@ function renderApp() {
         renderAppDetail(mainContent, params.url);
     });
 
+    addRoute('/library', (params) => {
+        setState('currentView', 'library');
+        renderLibrary(mainContent);
+    });
+
     addRoute('/settings', (params) => {
         setState('currentView', 'settings');
         renderSettings(mainContent);
     });
 
-    initRouter();
-    updateStatusBar();
-}
+    addRoute('/help', (params) => {
+        setState('currentView', 'help');
+        renderHelp(mainContent);
+    });
 
-async function updateStatusBar() {
-    // Will be populated with real data
+    initRouter();
 }
 
 document.addEventListener('DOMContentLoaded', renderApp);

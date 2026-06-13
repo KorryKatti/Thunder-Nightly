@@ -1,16 +1,18 @@
 import { el, formatNumber, escapeHtml } from '../utils.js';
 import { navigate } from '../router.js';
 import { renderURLBar } from '../components/urlbar.js';
-import { fetchRepoInfo, fetchReadme, installApp, openExternal } from '../api.js';
+import { fetchRepoInfo, fetchReadme, detectPythonProject, downloadAndInstall, openExternal } from '../api.js';
 import { showToast } from '../components/toasts.js';
 import { marked } from 'marked';
 
+let currentProjectInfo = null;
+
 export function renderAppDetail(container, encodedURL) {
     container.innerHTML = '';
+    currentProjectInfo = null;
 
     const url = decodeURIComponent(encodedURL);
 
-    // URL bar at top
     const urlSection = el('div', { className: 'detail-url-section' });
     renderURLBar(urlSection, {
         onSubmit: (newUrl) => navigate(`/app/${encodeURIComponent(newUrl)}`),
@@ -18,7 +20,6 @@ export function renderAppDetail(container, encodedURL) {
     });
     container.appendChild(urlSection);
 
-    // Loading state
     const contentArea = el('div', { className: 'detail-content', id: 'detail-content' });
     contentArea.appendChild(el('div', { className: 'detail-loading' }, [
         el('div', { className: 'spinner' }),
@@ -26,30 +27,22 @@ export function renderAppDetail(container, encodedURL) {
     ]));
     container.appendChild(contentArea);
 
-    // Fetch data
     loadRepoData(contentArea, url);
 }
 
 async function loadRepoData(container, url) {
     try {
-        console.log('Loading repo data for:', url);
-        const repoInfo = await fetchRepoInfo(url);
-        console.log('Repo info type:', typeof repoInfo, 'keys:', repoInfo ? Object.keys(repoInfo) : 'null');
-        console.log('Full repoInfo:', JSON.stringify(repoInfo, null, 2));
+        const [repoInfo, readme, projectInfo] = await Promise.all([
+            fetchRepoInfo(url),
+            fetchReadme(url),
+            detectPythonProject(url).catch(() => null)
+        ]);
 
-        if (!repoInfo || typeof repoInfo !== 'object') {
-            throw new Error('Invalid repository data received');
-        }
+        if (!repoInfo) throw new Error('No repository data returned');
 
-        let readme = '';
-        try {
-            readme = await fetchReadme(url);
-        } catch (readmeErr) {
-            console.warn('README fetch failed (non-fatal):', readmeErr);
-        }
-
+        currentProjectInfo = projectInfo;
         container.innerHTML = '';
-        renderRepoPage(container, repoInfo, readme, url);
+        renderRepoPage(container, repoInfo, readme, projectInfo, url);
     } catch (e) {
         console.error('Failed to load repo:', e);
         container.innerHTML = '';
@@ -66,7 +59,7 @@ async function loadRepoData(container, url) {
     }
 }
 
-function renderRepoPage(container, repo, readme, url) {
+function renderRepoPage(container, repo, readme, projectInfo, url) {
     // Hero
     const hero = el('div', { className: 'detail-hero' }, [
         el('div', { className: 'detail-hero-bg' }),
@@ -88,44 +81,21 @@ function renderRepoPage(container, repo, readme, url) {
         repo.LicenseName ? createStat('📄', repo.LicenseName, 'License') : null
     ].filter(Boolean));
 
-    // Actions
-    const actions = el('div', { className: 'detail-actions' }, [
-        el('button', {
-            className: 'btn btn-green btn-lg',
-            text: 'Install',
-            onClick: async (e) => {
-                e.target.disabled = true;
-                e.target.textContent = 'Installing...';
-                const result = await installApp(url);
-                if (result.success) {
-                    showToast(`${repo.Name} installed successfully!`, 'success');
-                    e.target.textContent = 'Installed';
-                } else {
-                    showToast('Install failed: ' + result.error, 'error');
-                    e.target.disabled = false;
-                    e.target.textContent = 'Install';
-                }
-            }
-        }),
-        el('button', {
-            className: 'btn btn-secondary btn-lg',
-            text: 'View on GitHub',
-            onClick: () => openExternal(repo.URL)
-        })
-    ]);
+    // Project info card
+    const projectCard = createProjectCard(projectInfo);
 
-    container.appendChild(hero);
-    container.appendChild(stats);
-    container.appendChild(actions);
+    // Install section
+    const installSection = el('div', { className: 'detail-install-section' });
+    renderInstallButton(installSection, url, repo.Name);
 
     // README
+    let readmeSection = null;
     if (readme) {
         const readmeContent = el('div', {
             className: 'detail-readme-content markdown-body',
             html: marked.parse(readme)
         });
 
-        // Open external links in system browser
         readmeContent.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (link) {
@@ -137,12 +107,92 @@ function renderRepoPage(container, repo, readme, url) {
             }
         });
 
-        const readmeSection = el('div', { className: 'detail-readme' }, [
+        readmeSection = el('div', { className: 'detail-readme' }, [
             el('h2', { className: 'detail-section-title', text: 'README' }),
             readmeContent
         ]);
-        container.appendChild(readmeSection);
     }
+
+    container.appendChild(hero);
+    container.appendChild(stats);
+    if (projectCard) container.appendChild(projectCard);
+    container.appendChild(installSection);
+    if (readmeSection) container.appendChild(readmeSection);
+}
+
+function createProjectCard(projectInfo) {
+    if (!projectInfo) return null;
+
+    const items = [];
+
+    if (projectInfo.HasPyproject) {
+        items.push(el('div', { className: 'project-item project-good' }, [
+            el('span', { className: 'project-icon', html: '&#10003;' }),
+            el('span', { text: 'pyproject.toml found' })
+        ]));
+    } else if (projectInfo.HasRequirements) {
+        items.push(el('div', { className: 'project-item project-good' }, [
+            el('span', { className: 'project-icon', html: '&#10003;' }),
+            el('span', { text: `${projectInfo.FileName} found` })
+        ]));
+    } else {
+        items.push(el('div', { className: 'project-item project-warn' }, [
+            el('span', { className: 'project-icon', text: '!' }),
+            el('span', { text: 'No Python project file detected' })
+        ]));
+    }
+
+    if (projectInfo.EntryPoint) {
+        items.push(el('div', { className: 'project-item' }, [
+            el('span', { className: 'project-icon', text: '▸' }),
+            el('span', { html: `Entry point: <strong>${projectInfo.EntryPoint}</strong>` })
+        ]));
+    }
+
+    if (projectInfo.FileSize > 0) {
+        items.push(el('div', { className: 'project-item' }, [
+            el('span', { className: 'project-icon', text: '▸' }),
+            el('span', { text: `Config file: ${formatFileSize(projectInfo.FileSize)}` })
+        ]));
+    }
+
+    return el('div', { className: 'detail-project-card' }, [
+        el('h3', { className: 'detail-project-title', text: 'Python Project' }),
+        el('div', { className: 'detail-project-items' }, items)
+    ]);
+}
+
+function renderInstallButton(container, url, repoName) {
+    const btn = el('button', {
+        className: 'btn btn-green btn-lg install-btn',
+        text: 'Download & Install',
+        onClick: async () => {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-inline"></span> Downloading...';
+
+            const result = await downloadAndInstall(url);
+            if (result.success) {
+                showToast(`${repoName} installed successfully!`, 'success');
+                btn.textContent = 'Installed';
+                btn.classList.add('installed');
+            } else {
+                showToast('Install failed: ' + result.error, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Download & Install';
+            }
+        }
+    });
+
+    const actions = el('div', { className: 'detail-actions' }, [
+        btn,
+        el('button', {
+            className: 'btn btn-secondary btn-lg',
+            text: 'View on GitHub',
+            onClick: () => openExternal(url)
+        })
+    ]);
+
+    container.appendChild(actions);
 }
 
 function createStat(icon, value, label) {
@@ -151,4 +201,10 @@ function createStat(icon, value, label) {
         el('span', { className: 'detail-stat-value', text: value }),
         el('span', { className: 'detail-stat-label', text: label })
     ]);
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }

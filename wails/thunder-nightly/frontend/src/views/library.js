@@ -1,11 +1,11 @@
-import { el, formatNumber } from '../utils.js';
-import { renderEmptyState } from '../components/emptystate.js';
+import { el, debounce } from '../utils.js';
 import { navigate } from '../router.js';
+import { getInstalledApps, launchApp, uninstallApp, createConfig, updateLaunchType, openExternal, checkForUpdates } from '../api.js';
+import { showToast } from '../components/toasts.js';
+import { renderEmptyState } from '../components/emptystate.js';
+import { refreshStatusBar } from '../components/statusbar.js';
 
-const mockInstalled = [
-    { id: 'open-interpreter', name: 'Open Interpreter', version: '0.2.0', status: 'installed', lastLaunched: '2025-05-28' },
-    { id: 'autogpt', name: 'AutoGPT', version: '0.5.0', status: 'update', lastLaunched: '2025-05-20' }
-];
+let allApps = [];
 
 export function renderLibrary(container) {
     container.innerHTML = '';
@@ -15,87 +15,156 @@ export function renderLibrary(container) {
         el('p', { className: 'view-subtitle', text: 'Manage your installed applications' })
     ]);
 
-    const filterTabs = el('div', { className: 'library-filters' }, [
-        createFilterTab('all', 'All', true),
-        createFilterTab('updatable', 'Updatable', false),
-        createFilterTab('running', 'Running', false)
+    // Search bar
+    const searchInput = el('input', {
+        className: 'library-search',
+        type: 'text',
+        placeholder: 'Search installed apps...'
+    });
+
+    const actionsBar = el('div', { className: 'library-actions' }, [
+        searchInput,
+        el('button', {
+            className: 'btn btn-secondary btn-sm',
+            text: 'Check Updates',
+            onClick: async (e) => {
+                e.target.disabled = true;
+                e.target.textContent = 'Checking...';
+                const updates = await checkForUpdates();
+                if (updates && updates.length > 0) {
+                    showToast(`${updates.length} update(s) available`, 'info');
+                } else {
+                    showToast('All apps up to date', 'success');
+                }
+                e.target.disabled = false;
+                e.target.textContent = 'Check Updates';
+            }
+        })
     ]);
 
-    const listContainer = el('div', { className: 'library-list' });
+    const listContainer = el('div', { className: 'library-list', id: 'library-list' });
+    listContainer.appendChild(el('div', { className: 'detail-loading' }, [
+        el('div', { className: 'spinner' }),
+        el('span', { text: 'Loading apps...' })
+    ]));
 
     container.appendChild(header);
-    container.appendChild(filterTabs);
+    container.appendChild(actionsBar);
     container.appendChild(listContainer);
 
-    renderLibraryList(listContainer, mockInstalled);
+    // Search handler
+    const doSearch = debounce((query) => {
+        const q = query.toLowerCase();
+        const filtered = allApps.filter(a =>
+            a.name.toLowerCase().includes(q) ||
+            (a.description && a.description.toLowerCase().includes(q))
+        );
+        renderAppList(listContainer, filtered);
+    }, 200);
+
+    searchInput.addEventListener('input', (e) => doSearch(e.target.value));
+
+    loadApps(listContainer);
 }
 
-function createFilterTab(id, label, active) {
-    return el('button', {
-        className: `library-filter-tab ${active ? 'active' : ''}`,
-        'data-filter': id,
-        text: label,
-        onClick: (e) => {
-            document.querySelectorAll('.library-filter-tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-        }
-    });
+async function loadApps(container) {
+    allApps = await getInstalledApps();
+    renderAppList(container, allApps);
+    refreshStatusBar();
 }
 
-function renderLibraryList(container, apps) {
+function renderAppList(container, apps) {
     container.innerHTML = '';
 
-    if (apps.length === 0) {
+    if (!apps || apps.length === 0) {
         renderEmptyState(container, {
             type: 'library',
             title: 'No apps installed',
-            description: 'Browse the Store to discover and install apps',
-            action: { label: 'Open Store', handler: () => navigate('/store') }
+            description: 'Paste a GitHub URL on the Home screen to install your first app',
+            action: { label: 'Go to Home', handler: () => navigate('/') }
         });
         return;
     }
 
     const list = el('div', { className: 'library-items' },
-        apps.map(app => createLibraryRow(app))
+        apps.map(app => createAppRow(app))
     );
-
     container.appendChild(list);
 }
 
-function createLibraryRow(app) {
-    const statusMap = {
-        installed: { label: 'Installed', class: 'status-installed' },
-        update: { label: 'Update Available', class: 'status-update' },
-        running: { label: 'Running', class: 'status-running' }
-    };
+function createAppRow(app) {
+    const launchType = app.launch_type || 'auto';
+    const typeLabel = launchType === 'cli' ? 'CLI' : launchType === 'gui' ? 'GUI' : 'Auto';
 
-    const status = statusMap[app.status] || statusMap.installed;
-
-    return el('div', { className: 'library-row' }, [
+    const row = el('div', { className: 'library-row' }, [
         el('div', { className: 'library-row-icon', text: app.name.charAt(0).toUpperCase() }),
         el('div', { className: 'library-row-info' }, [
             el('h3', { className: 'library-row-name', text: app.name }),
             el('div', { className: 'library-row-meta' }, [
-                el('span', { className: 'library-row-version', text: `v${app.version}` }),
-                el('span', { className: `library-row-status ${status.class}`, text: status.label })
+                el('span', { className: 'library-row-version', text: app.entry_point || 'main.py' }),
+                el('span', { className: `library-row-status status-launch-${launchType}`, text: typeLabel })
             ])
         ]),
         el('div', { className: 'library-row-actions' }, [
             el('button', {
                 className: 'btn btn-green btn-sm',
                 text: 'Launch',
-                onClick: () => console.log('Launch:', app.id)
+                onClick: async () => {
+                    const result = await launchApp(app.dir_name);
+                    if (result.success) {
+                        showToast(`Launched ${app.name}`, 'success');
+                    } else {
+                        showToast('Launch failed: ' + result.error, 'error');
+                    }
+                }
             }),
-            app.status === 'update' ? el('button', {
+            el('button', {
                 className: 'btn btn-secondary btn-sm',
-                text: 'Update',
-                onClick: () => console.log('Update:', app.id)
-            }) : null,
+                text: typeLabel,
+                title: 'Click to toggle: Auto → GUI → CLI',
+                onClick: async () => {
+                    const next = launchType === 'auto' ? 'gui' : launchType === 'gui' ? 'cli' : 'auto';
+                    await updateLaunchType(app.dir_name, next);
+                    showToast(`Launch type set to ${next}`, 'success');
+                    const listContainer = document.getElementById('library-list');
+                    if (listContainer) loadApps(listContainer);
+                }
+            }),
+            el('button', {
+                className: 'btn btn-secondary btn-sm',
+                text: 'Config',
+                onClick: async () => {
+                    const result = await createConfig(app.dir_name);
+                    if (result.success) {
+                        showToast('Config updated', 'success');
+                    } else {
+                        showToast('Config error: ' + result.error, 'error');
+                    }
+                }
+            }),
+            el('button', {
+                className: 'btn btn-secondary btn-sm',
+                text: 'GitHub',
+                onClick: () => openExternal(app.url)
+            }),
             el('button', {
                 className: 'btn btn-danger btn-sm',
                 text: 'Uninstall',
-                onClick: () => console.log('Uninstall:', app.id)
+                onClick: async () => {
+                    if (confirm(`Uninstall ${app.name}?`)) {
+                        const result = await uninstallApp(app.dir_name);
+                        if (result.success) {
+                            showToast(`${app.name} uninstalled`, 'success');
+                            const listContainer = document.getElementById('library-list');
+                            if (listContainer) loadApps(listContainer);
+                        } else {
+                            showToast('Uninstall failed: ' + result.error, 'error');
+                        }
+                    }
+                }
             })
-        ].filter(Boolean))
+        ])
     ]);
+
+    return row;
 }

@@ -695,6 +695,21 @@
     animation: pulse-blue 2s ease-in-out infinite;
 }
 
+.status-launch-auto {
+    background: rgba(139, 148, 158, 0.15);
+    color: var(--text-secondary);
+}
+
+.status-launch-gui {
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--accent-green);
+}
+
+.status-launch-cli {
+    background: rgba(188, 140, 255, 0.15);
+    color: var(--accent-purple);
+}
+
 @keyframes pulse-blue {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
@@ -1476,4 +1491,192 @@
     border: none;
     border-top: 1px solid var(--border);
     margin: 28px 0;
+}
+
+/* ===== PROJECT CARD ===== */
+.detail-project-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+}
+
+.detail-project-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+}
+
+.detail-project-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.project-icon {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+}
+
+.project-good .project-icon {
+    color: var(--accent-green);
+}
+
+.project-warn .project-icon {
+    color: var(--accent-orange);
+}
+
+/* ===== INSTALL BUTTON ===== */
+.detail-install-section {
+    margin-bottom: 32px;
+}
+
+.install-btn {
+    min-width: 180px;
+}
+
+.install-btn.installed {
+    background: var(--bg-elevated);
+    color: var(--accent-green);
+    cursor: default;
+}
+
+.spinner-inline {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+/* ===== LIBRARY PAGE ===== */
+.library-list {
+    min-height: 200px;
+}
+
+.library-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: center;
+}
+
+.library-search {
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: border-color var(--transition-fast);
+}
+
+.library-search::placeholder {
+    color: var(--text-muted);
+}
+
+.library-search:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+/* ===== HELP PAGE ===== */
+.help-hero {
+    margin-bottom: 36px;
+}
+
+.help-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+}
+
+.help-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.help-section-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.help-steps,
+.help-list {
+    padding-left: 20px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.help-steps li,
+.help-list li {
+    margin-bottom: 6px;
+}
+
+.help-list li::marker {
+    color: var(--accent-blue);
+}
+
+.help-footer {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.help-footer p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.help-inspo {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.help-inspo-quote {
+    margin: 16px 0;
+}
+
+.help-blockquote {
+    border-left: 3px solid var(--accent-red);
+    padding: 14px 18px;
+    background: rgba(248, 81, 73, 0.05);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.help-inspo-img {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
 }
